@@ -6,7 +6,7 @@
 [![Security: Maximum Post-Quantum](https://img.shields.io/badge/Security-Post--Quantum%20Ready-00f3ff.svg)](#-architettura-crittografica-nxs2)
 [![AEAD: XChaCha20-Poly1305](https://img.shields.io/badge/AEAD-XChaCha20--Poly1305-00ff9d.svg)](#)
 [![KDF: Argon2id Dual Profile](https://img.shields.io/badge/KDF-Argon2id%20(256MB%20%7C%2064MB)-purple.svg)](#)
-[![Tests: 41/41 Passed](https://img.shields.io/badge/Tests-41%2F41%20Passed%20(100%25)-brightgreen.svg)](#-continuous-integration--test-suite)
+[![Tests: 52/52 Passed](https://img.shields.io/badge/Tests-52%2F52%20Passed%20(100%25)-brightgreen.svg)](#-continuous-integration--test-suite)
 [![Framework Operativo: Tier CRITICO](https://img.shields.io/badge/Governance-Framework%20Operativo%20v3.1-orange.svg)](#)
 [![Confidential: Private Repository](https://img.shields.io/badge/Access-Private%20%2F%20Confidential-red.svg)](#)
 
@@ -263,19 +263,20 @@ Alfabeto Cryptato/
 │   ├── main.js                  # Code block processors ```nexa e ```nexa-encrypted
 │   ├── manifest.json
 │   └── styles.css               # Styling cyberpunk per note personali
-├── tests/                       # Suite di test unitari, integrazione e fuzzing (41 test)
-│   ├── test_phonetics.py        # Test fonetica, digrammi e validatore sintassi
-│   ├── test_crypto_v2.py        # Test AEAD, Ed25519, X25519, dual profile, chaos test
+├── tests/                       # Suite di test unitari, integrazione e fuzzing (52 test)
+│   ├── test_phonetics.py        # Test fonetica, digrammi, validatore e permutazione dinamica (26!)
+│   ├── test_crypto_v2.py        # Test AEAD, Ed25519, X25519, Pepper, dual profile, chaos test
 │   ├── test_container_nxs2.py   # Test formato NXS2, lossless metadata, retrocompatibilità
 │   ├── test_cyclelab_integration.py # Test Matassa Frozen IP & Mobile HUD
+│   ├── test_advanced_pillars.py # Test PoW, Canary, MemoryLock, Duress, Audit Ed25519, WebCSP
 │   └── test_fuzzing_properties.py   # 24 test invarianti e chaos fuzzing massivo
 ├── index.html                   # Web Terminal interattivo standalone
 ├── style.css                    # Design system cyberpunk-dark (glassmorphism)
 ├── app.js                       # Motore client-side (Web Crypto AEAD + Web Audio API)
-├── nexa_lib.py                  # Libreria core fonetica bidirezionale
-├── nexa_crypto_v2.py            # Modulo crittografico v2.0 Maximum Security
+├── nexa_lib.py                  # Libreria core fonetica bidirezionale con permutazione dinamica (26!)
+├── nexa_crypto_v2.py            # Modulo crittografico v2.0 (Post-Quantum, Argon2id, Pepper, Secret Key)
 ├── nexa_cli_v2.py               # CLI unificata di produzione
-├── cyclelab_bridge.py           # Connettore nativo per CycleLab Terminal
+├── cyclelab_bridge.py           # Connettore nativo per CycleLab Terminal (SDK 6 Pilastri Difesa)
 ├── run_ci.py                    # Runner CI locale one-click conforme al Framework Operativo
 ├── conftest.py                  # Configurazione path per test discovery
 ├── mypy.ini                     # Configurazione type checker strict

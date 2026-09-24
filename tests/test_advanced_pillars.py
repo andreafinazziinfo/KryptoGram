@@ -100,7 +100,7 @@ def test_duress_vault_switching_and_panic_alarm() -> None:
     assert mode_duress == VaultMode.DURESS
     assert payload_duress["matassa_ip"] == "MEDIA_MOBILE_SEMPLICE_SIMULATA"
     assert payload_duress["btc_balance"] == 0.05
-    assert vault.panic_triggered is True
+    assert vault.panic_triggered
     assert len(panic_alert_called) == 1
 
     # 3. Password errata
@@ -122,7 +122,7 @@ def test_audit_trail_immutable_chain_and_tamper_detection() -> None:
 
     # Simulazione Manomissione: un hacker modifica il secondo record
     audit._chain[1]["record"]["details"]["model_id"] = "TAMPERED_FAKE_MODEL"
-    assert audit.verify_integrity() is False
+    assert not audit.verify_integrity()
 
 
 def test_web_security_headers_compliance() -> None:

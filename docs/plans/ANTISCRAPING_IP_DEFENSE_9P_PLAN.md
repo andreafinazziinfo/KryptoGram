@@ -122,10 +122,29 @@ Questo piano definisce la strategia di **difesa attiva e protezione della propri
 
 ---
 
-### 9. PHASES / PACE (Roadmap di Blindatura in 3 Fasi)
+---
+
+### 10. ESTENSIONE STRATEGICA: I 6 PILASTRI AVANZATI (SDK Bridge Implementato ✓)
+
+A completamento del framework 9P, il modulo `cyclelab_bridge.py` fornisce 6 meccanismi di grado bancario/militare pronti all'uso:
+
+| Pilastro Avanzato | Componente Software | Minaccia Neutralizzata |
+|---|---|---|
+| **1. Proof-of-Work (PoW)** | `ProofOfWorkChallenge` | Botnet e attacchi DoS/CPU su endpoint di login Argon2id. |
+| **2. Canary Tripwires** | `CanaryTripwireManager` | Letture non autorizzate del DB; scatta allarme silenzioso e auto-purge RAM. |
+| **3. Memory Locking** | `MemoryLock` (`VirtualLock`/`mlock`) | Residui di chiavi e pesi Matassa nei file di swap su disco (`pagefile.sys`). |
+| **4. Duress Anti-Coercizione** | `DuressVaultManager` | Minaccia fisica al trader: apre un vault fittizio e distrugge la vera Matassa. |
+| **5. Audit Trail Immutabile** | `AuditTrailChain` (Ed25519) | Manomissione o cancellazione dei log di audit da parte di aggressori. |
+| **6. Web Defense & CSP** | `WebSecurityHeaders` | Iniezioni XSS, esfiltrazione iframe e furto token da estensioni browser. |
+
+---
+
+### 9. PHASES / PACE (Roadmap di Blindatura in 4 Fasi)
 
 | Fase di Blindatura | Interventi Chiave | Risultato di Sicurezza |
 |---|---|---|
 | **Fase 1: Network & Bot Shield** | Cloudflare Turnstile, filtro JA4, HMAC signing su API | Blocca Scrapy, Crawl4AI, Wget e script curl. |
 | **Fase 2: Core Isolation & Protobuf** | Formule Matassa solo su backend, streaming binario Protobuf | Rende inutile il de-bundling JS (zero formule esposte). |
 | **Fase 3: Desktop App Shielding** | Compilazione Bytenode V8 (`.jsc`), anti-debugging Electron | Blocca l'estrazione e l'analisi di `app.asar`. |
+| **Fase 4: Enclave & Defense-in-Depth** | PoW, Canary, MemoryLock, Duress, Audit Ed25519, Busta NXS2 | Blindatura totale del terminale quantitativo CycleLab. |
+
