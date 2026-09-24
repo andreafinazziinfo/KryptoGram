@@ -1,9 +1,10 @@
 /**
- * NEXA-S // Cryptographic Terminal & Phonetic Studio
+ * KryptoGram // Sovereign Cryptographic Terminal & Phonetic Studio
  * Core Client Application (JavaScript ES6+)
  * 
  * Features:
- * - Phonetic Transliteration Engine (ITA <-> NEXA-S)
+ * - Phonetic Transliteration Engine (Italiano <-> Glifi KryptoGram)
+ * - Keyed Dynamic Alphabet Permutation (26! Dialetti, ~88 bit entropia)
  * - Tactile Virtual Glyph Keyboard
  * - Web Cryptography API (PBKDF2-HMAC-SHA256 + AES-256-GCM / AEAD Envelope)
  * - Fixed Padding & Base64url Encoder/Decoder
@@ -16,7 +17,7 @@
   'use strict';
 
   /* ==========================================================================
-     1. TAVOLA FONETICA UFFICIALE NEXA-S
+     1. TAVOLA FONETICA UFFICIALE KRYPTOGRAM (Kryptós + Grámma)
      ========================================================================== */
   const VOWEL_MAP = {
     'a': '⊕', 'e': '≋', 'i': '∿', 'o': '⊙', 'u': '∪',
@@ -48,6 +49,65 @@
     '⌇': 'j', '⌯': 'l', '⋔': 'm', '⋒': 'n', '⌐': 'p', '⌿': 'r',
     '≈': 's', '↑': 'z', '∴': '.', '⇒': ' allora ', '≥': ' >= ', '≤': ' <= '
   };
+
+  /* ==========================================================================
+     1.1 PERMUTAZIONE DINAMICA CON CHIAVE (26! Dialetti KryptoGram)
+     ========================================================================== */
+  const DYNAMIC_GLYPH_POOL = [
+    '⊕', '≋', '∿', '⊙', '∪', '⊓', '⌁', '∆', 'ƒ', '⅁',
+    '⊥', '⌇', '⌯', '⋔', '⋒', '⌐', '⌿', '≈', '↑', '⌖',
+    '⊞', '◊', '∇', '⋐', '⋑', '⨁'
+  ];
+  const BASE_ALPHABET_CHARS = 'abcdefghijklmnopqrstuvwxyz'.split('');
+  const dynamicAlphabetCache = new Map();
+
+  async function deriveDynamicAlphabet(seedKey) {
+    if (!seedKey) return null;
+    if (dynamicAlphabetCache.has(seedKey)) {
+      return dynamicAlphabetCache.get(seedKey);
+    }
+    const glyphs = [...DYNAMIC_GLYPH_POOL];
+    const enc = new TextEncoder();
+    const saltKey = await crypto.subtle.importKey(
+      'raw',
+      enc.encode('KRYPTEX_DYNAMIC_ALPHABET_V2_SALT'),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    const h = new Uint8Array(await crypto.subtle.sign('HMAC', saltKey, enc.encode(seedKey)));
+
+    for (let i = glyphs.length - 1; i > 0; i--) {
+      const buf = new Uint8Array(h.length + 1);
+      buf.set(h, 0);
+      buf[h.length] = i;
+      const subHashBuffer = await crypto.subtle.digest('SHA-256', buf);
+      const dv = new DataView(subHashBuffer);
+      const val = dv.getUint32(0, false);
+      const j = val % (i + 1);
+      const tmp = glyphs[i];
+      glyphs[i] = glyphs[j];
+      glyphs[j] = tmp;
+    }
+
+    const fwd = {};
+    BASE_ALPHABET_CHARS.forEach((c, idx) => {
+      fwd[c] = glyphs[idx];
+    });
+    // Accenti base
+    [['à', 'a'], ['è', 'e'], ['é', 'e'], ['ì', 'i'], ['ò', 'o'], ['ù', 'u']].forEach(([acc, base]) => {
+      fwd[acc] = fwd[base];
+    });
+
+    const rev = {};
+    BASE_ALPHABET_CHARS.forEach((c, idx) => {
+      rev[glyphs[idx]] = c;
+    });
+
+    const result = { fwd, rev };
+    dynamicAlphabetCache.set(seedKey, result);
+    return result;
+  }
 
   /* ==========================================================================
      2. WEB AUDIO SYNTHESIZER (Cyber Acoustic Feedback)
@@ -142,106 +202,171 @@
   const audio = new CyberAudio();
 
   /* ==========================================================================
-     3. MOTORE DI TRASLITTERAZIONE FONETICA
+     3. MOTORE DI TRASLITTERAZIONE FONETICA KRYPTOGRAM
      ========================================================================== */
-  function transliterateItalianToNexa(text, wrapBlocks = true) {
-    if (!text) return '';
+  function transliterateItalianToNexa(text, wrapBlocks = true, dynamicTable = null) {
+    if (!text) return { result: '', breakdown: [] };
     const clean = text.normalize('NFC');
     const output = [];
     const breakdown = [];
     const n = clean.length;
     let i = 0;
 
-    while (i < n) {
-      const char = clean[i];
+    // Se modalità dinamica con chiave attiva (26! permutazioni)
+    if (dynamicTable && dynamicTable.fwd) {
+      while (i < n) {
+        const char = clean[i];
 
-      // Gestione numeri (es: 18, 18:30, 30%)
-      if (/\d/.test(char)) {
-        let numStart = i;
-        while (i < n && /[\d\.,]/.test(clean[i])) {
+        if (/\d/.test(char)) {
+          let numStart = i;
+          while (i < n && /[\d\.,]/.test(clean[i])) {
+            i++;
+          }
+          const numStr = clean.slice(numStart, i);
+          const glyphToken = `⟪${numStr}⟫`;
+          output.push(glyphToken);
+          breakdown.push({ orig: numStr, glyph: glyphToken });
+          continue;
+        }
+
+        if (clean.slice(i, i + 2) === '=>') {
+          output.push('⇒');
+          breakdown.push({ orig: '=>', glyph: '⇒' });
+          i += 2;
+          continue;
+        }
+        if (clean.slice(i, i + 2) === '>=') {
+          output.push('≥');
+          breakdown.push({ orig: '>=', glyph: '≥' });
+          i += 2;
+          continue;
+        }
+        if (clean.slice(i, i + 2) === '<=') {
+          output.push('≤');
+          breakdown.push({ orig: '<=', glyph: '≤' });
+          i += 2;
+          continue;
+        }
+
+        if (/\s/.test(char)) {
+          output.push(char);
           i++;
+          continue;
         }
-        const numStr = clean.slice(numStart, i);
-        const glyphToken = `⟪${numStr}⟫`;
-        output.push(glyphToken);
-        breakdown.push({ orig: numStr, glyph: glyphToken });
-        continue;
-      }
 
-      // Operatori speciali
-      if (clean.slice(i, i + 2) === '=>') {
-        output.push('⇒');
-        breakdown.push({ orig: '=>', glyph: '⇒' });
-        i += 2;
-        continue;
-      }
-      if (clean.slice(i, i + 2) === '>=') {
-        output.push('≥');
-        breakdown.push({ orig: '>=', glyph: '≥' });
-        i += 2;
-        continue;
-      }
-      if (clean.slice(i, i + 2) === '<=') {
-        output.push('≤');
-        breakdown.push({ orig: '<=', glyph: '≤' });
-        i += 2;
-        continue;
-      }
-
-      // Spaziature
-      if (/\s/.test(char)) {
-        output.push(char);
-        i++;
-        continue;
-      }
-
-      // Punteggiatura mappata
-      if (PUNCTUATION_MAP[char]) {
-        const pGlyph = PUNCTUATION_MAP[char];
-        output.push(pGlyph);
-        breakdown.push({ orig: char, glyph: pGlyph });
-        i++;
-        continue;
-      }
-
-      // Digrammi fonetici (priorità lunghezza 3 e 2)
-      const sub3 = clean.slice(i, i + 3).toLowerCase();
-      const sub2 = clean.slice(i, i + 2).toLowerCase();
-
-      if (sub3.length === 3 && DIGRAPH_MAP[sub3]) {
-        output.push(DIGRAPH_MAP[sub3]);
-        breakdown.push({ orig: clean.slice(i, i + 3), glyph: DIGRAPH_MAP[sub3] });
-        i += 3;
-        continue;
-      }
-
-      if (sub2.length === 2 && DIGRAPH_MAP[sub2]) {
-        output.push(DIGRAPH_MAP[sub2]);
-        breakdown.push({ orig: clean.slice(i, i + 2), glyph: DIGRAPH_MAP[sub2] });
-        i += 2;
-        continue;
-      }
-
-      // Singolo fonema
-      const lower = char.toLowerCase();
-      if (VOWEL_MAP[lower]) {
-        // Se lettera A maiuscola iniziale di parola, usa variante '∧'
-        let g = VOWEL_MAP[lower];
-        if (char === 'A' && (i === 0 || /[\s\t\n⟦]/.test(clean[i - 1]))) {
-          g = '∧';
+        if (PUNCTUATION_MAP[char]) {
+          const pGlyph = PUNCTUATION_MAP[char];
+          output.push(pGlyph);
+          breakdown.push({ orig: char, glyph: pGlyph });
+          i++;
+          continue;
         }
-        output.push(g);
-        breakdown.push({ orig: char, glyph: g });
-      } else if (CONSONANT_MAP[lower]) {
-        const g = CONSONANT_MAP[lower];
-        output.push(g);
-        breakdown.push({ orig: char, glyph: g });
-      } else {
-        output.push(char);
-        breakdown.push({ orig: char, glyph: char });
-      }
 
-      i++;
+        const lower = char.toLowerCase();
+        if (dynamicTable.fwd[lower]) {
+          const g = dynamicTable.fwd[lower];
+          output.push(g);
+          breakdown.push({ orig: char, glyph: g });
+        } else {
+          output.push(char);
+          breakdown.push({ orig: char, glyph: char });
+        }
+
+        i++;
+      }
+    } else {
+      // Modalità canonica standard
+      while (i < n) {
+        const char = clean[i];
+
+        // Gestione numeri (es: 18, 18:30, 30%)
+        if (/\d/.test(char)) {
+          let numStart = i;
+          while (i < n && /[\d\.,]/.test(clean[i])) {
+            i++;
+          }
+          const numStr = clean.slice(numStart, i);
+          const glyphToken = `⟪${numStr}⟫`;
+          output.push(glyphToken);
+          breakdown.push({ orig: numStr, glyph: glyphToken });
+          continue;
+        }
+
+        // Operatori speciali
+        if (clean.slice(i, i + 2) === '=>') {
+          output.push('⇒');
+          breakdown.push({ orig: '=>', glyph: '⇒' });
+          i += 2;
+          continue;
+        }
+        if (clean.slice(i, i + 2) === '>=') {
+          output.push('≥');
+          breakdown.push({ orig: '>=', glyph: '≥' });
+          i += 2;
+          continue;
+        }
+        if (clean.slice(i, i + 2) === '<=') {
+          output.push('≤');
+          breakdown.push({ orig: '<=', glyph: '≤' });
+          i += 2;
+          continue;
+        }
+
+        // Spaziature
+        if (/\s/.test(char)) {
+          output.push(char);
+          i++;
+          continue;
+        }
+
+        // Punteggiatura mappata
+        if (PUNCTUATION_MAP[char]) {
+          const pGlyph = PUNCTUATION_MAP[char];
+          output.push(pGlyph);
+          breakdown.push({ orig: char, glyph: pGlyph });
+          i++;
+          continue;
+        }
+
+        // Digrammi fonetici (priorità lunghezza 3 e 2)
+        const sub3 = clean.slice(i, i + 3).toLowerCase();
+        const sub2 = clean.slice(i, i + 2).toLowerCase();
+
+        if (sub3.length === 3 && DIGRAPH_MAP[sub3]) {
+          output.push(DIGRAPH_MAP[sub3]);
+          breakdown.push({ orig: clean.slice(i, i + 3), glyph: DIGRAPH_MAP[sub3] });
+          i += 3;
+          continue;
+        }
+
+        if (sub2.length === 2 && DIGRAPH_MAP[sub2]) {
+          output.push(DIGRAPH_MAP[sub2]);
+          breakdown.push({ orig: clean.slice(i, i + 2), glyph: DIGRAPH_MAP[sub2] });
+          i += 2;
+          continue;
+        }
+
+        // Singolo fonema
+        const lower = char.toLowerCase();
+        if (VOWEL_MAP[lower]) {
+          // Se lettera A maiuscola iniziale di parola, usa variante '∧'
+          let g = VOWEL_MAP[lower];
+          if (char === 'A' && (i === 0 || /[\s\t\n⟦]/.test(clean[i - 1]))) {
+            g = '∧';
+          }
+          output.push(g);
+          breakdown.push({ orig: char, glyph: g });
+        } else if (CONSONANT_MAP[lower]) {
+          const g = CONSONANT_MAP[lower];
+          output.push(g);
+          breakdown.push({ orig: char, glyph: g });
+        } else {
+          output.push(char);
+          breakdown.push({ orig: char, glyph: char });
+        }
+
+        i++;
+      }
     }
 
     let result = output.join('');
@@ -256,11 +381,13 @@
     return { result, breakdown };
   }
 
-  function transliterateNexaToItalian(nexaText) {
+  function transliterateNexaToItalian(nexaText, dynamicTable = null) {
     if (!nexaText) return '';
     const output = [];
     const n = nexaText.length;
     let i = 0;
+
+    const revMap = (dynamicTable && dynamicTable.rev) ? dynamicTable.rev : REVERSE_GLYPH_MAP;
 
     while (i < n) {
       const char = nexaText[i];
@@ -282,8 +409,8 @@
       }
 
       // Mappatura inversa
-      if (REVERSE_GLYPH_MAP[char]) {
-        output.push(REVERSE_GLYPH_MAP[char]);
+      if (revMap[char]) {
+        output.push(revMap[char]);
       } else {
         output.push(char);
       }
@@ -721,6 +848,12 @@
     const sendToVaultBtn = document.getElementById('sendToVaultBtn');
     const downloadGlyphsBtn = document.getElementById('downloadGlyphsBtn');
 
+    // Selettore Permutazione Dinamica Keyed
+    const alphabetModeSelect = document.getElementById('alphabetModeSelect');
+    const alphabetKeyWrapper = document.getElementById('alphabetKeyWrapper');
+    const alphabetKeyInput = document.getElementById('alphabetKeyInput');
+    const transliterateBtn = document.getElementById('transliterateBtn');
+
     // Audio toggle
     const soundToggleBtn = document.getElementById('soundToggleBtn');
     const soundStatusText = document.getElementById('soundStatusText');
@@ -802,13 +935,26 @@
     });
 
     // Aggiornamento Live della Traslitterazione
-    function updateTransliteration() {
+    async function updateTransliteration() {
       const raw = inputText.value;
       inputTextCount.textContent = `${raw.length} caratteri`;
 
+      // Determina dialetto dinamico se selezionato
+      let dynamicTable = null;
+      if (alphabetModeSelect && alphabetModeSelect.value === 'dynamic') {
+        const seed = (alphabetKeyInput && alphabetKeyInput.value) || '';
+        if (seed) {
+          try {
+            dynamicTable = await deriveDynamicAlphabet(seed);
+          } catch (e) {
+            console.warn('Errore derivazione alfabeto dinamico:', e);
+          }
+        }
+      }
+
       if (currentDirection === 'ITA_TO_NEXA') {
         const wrap = wrapBlocksCheck.checked;
-        const { result, breakdown } = transliterateItalianToNexa(raw, wrap);
+        const { result, breakdown } = transliterateItalianToNexa(raw, wrap, dynamicTable);
         outputGlyphs.value = result;
         outputGlyphCount.textContent = `${result.length} glifi`;
 
@@ -822,12 +968,12 @@
         // Render Breakdown
         renderPhoneticBreakdown(breakdown);
       } else {
-        const italianDecoded = transliterateNexaToItalian(raw);
+        const italianDecoded = transliterateNexaToItalian(raw, dynamicTable);
         outputGlyphs.value = italianDecoded;
         outputGlyphCount.textContent = `${italianDecoded.length} caratteri`;
         syntaxStatus.textContent = 'DECODIFICATO';
         syntaxStatus.className = 'text-cyan';
-        phoneticBreakdown.innerHTML = `<div class="empty-hint">Decodifica inversa attiva da glifi a testo italiano naturale.</div>`;
+        phoneticBreakdown.innerHTML = `<div class="empty-hint">Decodifica inversa attiva da glifi a testo naturale (${dynamicTable ? 'Permutazione Dinamica 26!' : 'Canonico Standard'}).</div>`;
       }
     }
 
@@ -867,16 +1013,44 @@
       updateTransliteration();
     });
 
+    if (alphabetModeSelect) {
+      alphabetModeSelect.addEventListener('change', () => {
+        audio.playClick(600, 0.03);
+        const isDynamic = alphabetModeSelect.value === 'dynamic';
+        if (alphabetKeyWrapper) {
+          alphabetKeyWrapper.style.display = isDynamic ? 'block' : 'none';
+        }
+        if (isDynamic && alphabetKeyInput) {
+          alphabetKeyInput.focus();
+        }
+        updateTransliteration();
+      });
+    }
+
+    if (alphabetKeyInput) {
+      alphabetKeyInput.addEventListener('input', () => {
+        audio.playClick(480, 0.015);
+        updateTransliteration();
+      });
+    }
+
+    if (transliterateBtn) {
+      transliterateBtn.addEventListener('click', () => {
+        audio.playClick(700, 0.04);
+        updateTransliteration();
+      });
+    }
+
     // Inversione Direzione
     swapDirectionBtn.addEventListener('click', () => {
       audio.playClick(750, 0.05);
       if (currentDirection === 'ITA_TO_NEXA') {
         currentDirection = 'NEXA_TO_ITA';
-        swapLabel.textContent = 'NEXA → ITA';
-        inputText.placeholder = "Incolla o digita glifi NEXA-S (es: '⟦∧⋒∆⌿≋⊕⟧')...";
+        swapLabel.textContent = 'GLIFI → ITA';
+        inputText.placeholder = "Incolla o digita glifi KryptoGram (es: '⟦∧⋒∆⌿≋⊕⟧')...";
       } else {
         currentDirection = 'ITA_TO_NEXA';
-        swapLabel.textContent = 'ITA → NEXA';
+        swapLabel.textContent = 'ITA → GLIFI';
         inputText.placeholder = "Digita o incolla testo in italiano...";
       }
       // Scambio testi correnti
@@ -918,7 +1092,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `nexa_document_${Date.now()}.nexa`;
+      a.download = `kryptogram_${Date.now()}.kg2`;
       a.click();
       URL.revokeObjectURL(url);
     });
@@ -993,7 +1167,7 @@
       }
 
       // Seleziona il testo da cifrare (priorità ai glifi generati nello Studio)
-      const dataToEncrypt = outputGlyphs.value || inputText.value || "Testo di default NEXA-S";
+      const dataToEncrypt = outputGlyphs.value || inputText.value || "Testo di default KryptoGram";
       const pad = parseInt(vaultPaddingSelect.value, 10);
       const format = vaultFormatSelect ? vaultFormatSelect.value : 'nxs2';
       const profile = vaultKdfProfileSelect ? vaultKdfProfileSelect.value : 'desktop';
@@ -1028,7 +1202,7 @@
         vaultStatusMessage.className = 'envelope-status text-rose';
       } finally {
         encryptActionBtn.disabled = false;
-        encryptActionBtn.innerHTML = '<span class="btn-icon">🔒</span><span>Cifra e Genera Busta (.nxs2 / .nexa)</span>';
+        encryptActionBtn.innerHTML = '<span class="btn-icon">🔒</span><span>Cifra e Genera Busta (.kg2 / .nxs2)</span>';
       }
     });
 
@@ -1079,7 +1253,7 @@
         vaultStatusMessage.className = 'envelope-status text-rose';
       } finally {
         decryptActionBtn.disabled = false;
-        decryptActionBtn.innerHTML = '<span class="btn-icon">🔓</span><span>Decifra Busta (.nxs2 / .nexa)</span>';
+        decryptActionBtn.innerHTML = '<span class="btn-icon">🔓</span><span>Decifra Busta (.kg2 / .nxs2)</span>';
       }
     });
 
@@ -1138,7 +1312,7 @@
       if (!text) return;
       inputText.value = text;
       currentDirection = 'ITA_TO_NEXA';
-      swapLabel.textContent = 'ITA → NEXA';
+      swapLabel.textContent = 'ITA → GLIFI';
       updateTransliteration();
       switchTab('studio');
     }
@@ -1196,7 +1370,7 @@
 
     // Inizializzazione iniziale con preset dimostrativo
     loadPreset('andrea');
-    vaultPassphrase.value = 'NexaSecureKey2026!';
+    vaultPassphrase.value = 'KryptoGram2026!Key';
     vaultPassphrase.dispatchEvent(new Event('input'));
   });
 

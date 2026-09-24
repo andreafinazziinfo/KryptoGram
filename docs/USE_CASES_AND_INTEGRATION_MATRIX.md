@@ -2,10 +2,10 @@
 
 ## 📌 Visione d'Insieme
 
-Questo documento mappa e formalizza tutti i casi d'uso concreti di **KRYPTEX / NEXA-S v2.0**, suddivisi tra:
+Questo documento mappa e formalizza tutti i casi d'uso concreti di **KryptoGram v2.0** (dal greco *Kryptós* = nascosto + *Grámma* = scrittura), suddivisi tra:
 1. **Integrazione Verticale con CycleLab Terminal** (Difesa IP Matassa, API Gateway, Chatbot, Trading Signal Bus, Anti-Scraping 9P).
 2. **Applicazioni Esterne Universali** (Cold storage fisico su piastre metalliche, Obsidian vault cifrato, VS Code, comunicazioni covert, tutela brevetti e progetti dell'ecosistema).
-3. **Analisi di Sicurezza & Threat Model**: Confronto tra crittografia Kerckhoffs e steganografia cognitiva dell'alfabeto fonetico (rischi del rilascio pubblico vs privato).
+3. **Analisi di Sicurezza & Threat Model**: Principio di Kerckhoffs e permutazione dinamica con chiave ($26! \approx 4.03 \times 10^{26}$ dialetti per rilascio pubblico su GitHub).
 
 ---
 

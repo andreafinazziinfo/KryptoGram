@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test di Verifica Reale End-to-End per NEXA-S v2.0
+Test di Verifica Reale End-to-End per KryptoGram v2.0
 Esegue tutte le operazioni crittografiche, steganografiche e di integrazione CycleLab
 su file reali su disco con misurazione dei tempi e validazione dell'integrità.
 """
@@ -232,7 +232,7 @@ def test_3_performance_benchmark():
 
 def main():
     print("="*70)
-    print("NEXA-S v2.0 - SUITE DI VERIFICA REALE SISTEMA & INTEGRAZIONI")
+    print("KryptoGram v2.0 - SUITE DI VERIFICA REALE SISTEMA & INTEGRAZIONI")
     print("Conforme a Framework Operativo Tier CRITICO & Standard NIST FIPS 203")
     print("="*70)
     

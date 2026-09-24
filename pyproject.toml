@@ -3,16 +3,16 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nexa-s"
-version = "1.3.0"
-description = "NEXA-S: Symbolic Phonetic Alphabet + Modern Cryptography"
+name = "kryptogram"
+version = "2.0.0"
+description = "KryptoGram: Sovereign Post-Quantum Cryptographic Envelope & Keyed Phonetic Conlang"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [{name = "Andrea Finazzi"}]
-keywords = ["cryptography", "phonetic", "alphabet", "security", "xchacha20"]
+keywords = ["cryptography", "phonetic", "conlang", "post-quantum", "kyber", "xchacha20", "kryptogram"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.10",
@@ -23,6 +23,7 @@ classifiers = [
 dependencies = [
     "PyNaCl>=1.5.0",
     "argon2-cffi>=23.1.0",
+    "cryptography>=41.0.0",
 ]
 
 [project.optional-dependencies]
@@ -31,12 +32,13 @@ dev = [
     "hypothesis>=6.88.0",
     "mypy>=1.5.0",
     "ruff>=0.0.290",
-    "black>=23.7.0",
 ]
 
 [project.scripts]
-nexa-encrypt = "nexa_encrypt:main"
+kryptogram = "nexa_cli_v2:main"
+nexa-s = "nexa_cli_v2:main"
 nexa-gui = "gui_nexa:main"
+
 
 [tool.setuptools.packages.find]
 where = ["."]

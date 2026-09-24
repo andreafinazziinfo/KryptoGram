@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""NEXA-S v2.0 Unified Command Line Interface.
+"""KryptoGram v2.0 Unified Command Line Interface.
+(dal greco: Kryptós = Nascosto, Grámma = Scrittura)
 
 Fornisce comandi completi di produzione per:
-- Cifratura e confezionamento buste NXS2
+- Cifratura e confezionamento buste post-quantum NXS2
 - Decifratura trasparente (con fallback legacy NXS1)
-- Traslitterazione fonetica e ripristino Lossless
+- Traslitterazione fonetica standard e permutazione dinamica (26! dialetti)
 - Selezione profilo KDF (desktop vault vs mobile terminal)
 """
 
@@ -35,7 +36,7 @@ def read_passphrase(confirm: bool = False) -> str:
                 raise ValueError("Le due passphrase inserite non coincidono")
         return p1
     else:
-        p1 = getpass.getpass("Inserisci passphrase NEXA-S: ")
+        p1 = getpass.getpass("Inserisci passphrase KryptoGram: ")
         if confirm:
             p2 = getpass.getpass("Conferma passphrase: ")
             if p1 != p2:
@@ -47,18 +48,19 @@ def main() -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(
-        prog="nexa-s",
-        description="NEXA-S v2.0 — Post-Quantum Symbolic Cryptography Engine",
+        prog="kryptogram",
+        description="KryptoGram v2.0 — Post-Quantum Symbolic Cryptography Engine (Kryptós + Grámma)",
     )
     subparsers = parser.add_subparsers(dest="cmd", required=True)
 
     # Subcommand: Encrypt
     enc = subparsers.add_parser("encrypt", help="Cifra un file o documento in busta NXS2")
     enc.add_argument("--in", dest="inp", required=True, help="File sorgente in chiaro")
-    enc.add_argument("--out", dest="outp", required=True, help="Percorso file busta .nexa generato")
+    enc.add_argument("--out", dest="outp", required=True, help="Percorso file busta generato")
     enc.add_argument("--pad", type=int, default=4096, help="Target padding fisso in byte (default: 4096)")
     enc.add_argument("--profile", choices=["desktop", "mobile"], default="desktop", help="Profilo KDF Argon2id")
-    enc.add_argument("--nexa", action="store_true", help="Traslittera il testo in glifi NEXA-S prima di cifrare")
+    enc.add_argument("--nexa", action="store_true", help="Traslittera il testo in glifi fonetici prima di cifrare")
+    enc.add_argument("--alphabet-key", type=str, default=None, help="Chiave segreta per permutazione dinamica (26! combinazioni)")
     enc.add_argument("--lossless", action="store_true", default=True, help="Include metadata per decodifica ortografica identica al 100%")
     enc.add_argument("--pq", action="store_true", help="Abilita incapsulamento ibrido Post-Quantum ML-KEM-768")
     enc.add_argument("--new-passphrase", action="store_true", help="Richiedi conferma della passphrase")
@@ -66,14 +68,16 @@ def main() -> None:
 
     # Subcommand: Decrypt
     dec = subparsers.add_parser("decrypt", help="Decifra e valida una busta NXS2 (o legacy)")
-    dec.add_argument("--in", dest="inp", required=True, help="File busta .nexa cifrato")
+    dec.add_argument("--in", dest="inp", required=True, help="File busta .nexa/.kg2 cifrato")
     dec.add_argument("--out", dest="outp", required=True, help="File destinazione decifrato")
     dec.add_argument("--nexa", action="store_true", help="Ritraslittera da glifi fonetici a testo")
+    dec.add_argument("--alphabet-key", type=str, default=None, help="Chiave segreta per decodifica da alfabeto dinamico (26!)")
 
     # Subcommand: Transliterate
     trans = subparsers.add_parser("transliterate", help="Traslittera direttamente testo ⇄ glifi senza cifrare")
     trans.add_argument("--text", type=str, help="Stringa di testo o glifi da traslitterare")
-    trans.add_argument("--reverse", action="store_true", help="Inverti direzione (NEXA-S -> Italiano)")
+    trans.add_argument("--reverse", action="store_true", help="Inverti direzione (Glifi -> Italiano)")
+    trans.add_argument("--alphabet-key", type=str, default=None, help="Chiave segreta per permutazione dinamica (26!)")
 
     args = parser.parse_args()
 
@@ -82,9 +86,9 @@ def main() -> None:
             print("Specificare --text per la traslitterazione", file=sys.stderr)
             sys.exit(1)
         if args.reverse:
-            res = nexa_to_italian(args.text)
+            res = nexa_to_italian(args.text, alphabet_key=args.alphabet_key)
         else:
-            res = italian_to_nexa(args.text)
+            res = italian_to_nexa(args.text, alphabet_key=args.alphabet_key)
         print(res)
         return
 
@@ -107,7 +111,7 @@ def main() -> None:
             if args.lossless:
                 orig_text = text_candidate
             if args.nexa:
-                glyphs = italian_to_nexa(text_candidate)
+                glyphs = italian_to_nexa(text_candidate, alphabet_key=args.alphabet_key)
                 data_to_encrypt = glyphs.encode("utf-8")
         except UnicodeDecodeError:
             # File binario, procedi senza traslitterazione
@@ -147,7 +151,7 @@ def main() -> None:
         elif args.nexa:
             try:
                 glyphs = decrypted_payload.decode("utf-8")
-                final_output = nexa_to_italian(glyphs).encode("utf-8")
+                final_output = nexa_to_italian(glyphs, alphabet_key=args.alphabet_key).encode("utf-8")
             except UnicodeDecodeError:
                 final_output = decrypted_payload
         else:

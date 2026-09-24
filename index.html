@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NEXA-S // Cryptographic Terminal & Phonetic Studio</title>
-  <meta name="description" content="Terminale interattivo per NEXA-S: alfabeto fonetico simbolico, cifratura autenticata AEAD e integrazione quantitativa per CycleLab.">
+  <title>KryptoGram // Sovereign Cryptographic Terminal &amp; Phonetic Studio</title>
+  <meta name="description" content="Terminale interattivo per KryptoGram (dal greco Kryptós + Grámma): alfabeto simbolico a permutazione dinamica, busta post-quantum NXS2 e connettore CycleLab.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -25,10 +25,10 @@
         </div>
         <div>
           <div class="brand-title">
-            <h1>NEXA-S <span class="version-tag">v2.0.0</span> <span class="badge badge-cyan" style="font-size:0.65rem; padding: 2px 6px; margin-left: 4px; vertical-align: middle;">POST-QUANTUM READY</span></h1>
+            <h1>KryptoGram <span class="version-tag">v2.0</span> <span class="badge badge-cyan" style="font-size:0.65rem; padding: 2px 6px; margin-left: 4px; vertical-align: middle;">POST-QUANTUM READY</span></h1>
             <span class="status-indicator online"><span class="status-dot"></span> ENCLAVE OPERATIVO</span>
           </div>
-          <p class="brand-subtitle">Symbolic Phonetic Alphabet &bull; NXS2 Post-Quantum Envelope &bull; CycleLab Security Bridge</p>
+          <p class="brand-subtitle">Kryptós (Nascosto) + Grámma (Scrittura) &bull; 26! Keyed Conlang &bull; NXS2 Post-Quantum Envelope &bull; CycleLab Bridge</p>
         </div>
       </div>
 
@@ -110,7 +110,7 @@
         <div class="middle-controls">
           <button class="swap-direction-btn" id="swapDirectionBtn" title="Inverti direzione di conversione">
             <span class="swap-arrow">⇄</span>
-            <span class="swap-label" id="swapLabel">ITA → NEXA</span>
+            <span class="swap-label" id="swapLabel">ITA → GLIFI</span>
           </button>
           <div class="option-toggle">
             <label class="toggle-switch">
@@ -119,17 +119,29 @@
             </label>
             <span class="toggle-label" title="Racchiude frasi ed entità nei delimitatori ⟦...⟧">Delimitatori ⟦ ⟧</span>
           </div>
-          <button class="btn btn-primary pulse-btn" id="transliterateBtn">
+          <!-- Selettore Permutazione Dinamica Keyed -->
+          <div class="alphabet-mode-box" style="margin-top: 10px; width: 100%;">
+            <label for="alphabetModeSelect" class="control-label" style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Dialetto Alfabeto:</label>
+            <select id="alphabetModeSelect" class="cyber-select" style="font-size: 0.8rem; padding: 6px 10px;">
+              <option value="canonical" selected>✦ Canonico Standard (Pubblico)</option>
+              <option value="dynamic">🔒 Permutazione Dinamica (26! Dialetti)</option>
+            </select>
+          </div>
+          <div id="alphabetKeyWrapper" style="display: none; margin-top: 8px; width: 100%;">
+            <input type="password" id="alphabetKeyInput" class="cyber-input" style="font-size: 0.8rem; padding: 6px 10px;" placeholder="Chiave segreta alfabeto..." title="Chiave segreta per generare la permutazione dinamica (26! combinazioni = 88 bit)">
+            <span style="font-size: 0.7rem; color: var(--accent-amber); display: block; margin-top: 3px;">26! combinazioni (~88 bit)</span>
+          </div>
+          <button class="btn btn-primary pulse-btn" id="transliterateBtn" style="margin-top: 10px;">
             <span>Traslittera Ora</span>
           </button>
         </div>
 
-        <!-- Pannello Output Glifi NEXA-S -->
+        <!-- Pannello Output Glifi KryptoGram -->
         <div class="glass-card editor-panel">
           <div class="panel-header">
             <div class="panel-title-wrap">
               <span class="badge badge-emerald">OUTPUT</span>
-              <h2>Glifi Fonetici NEXA-S</h2>
+              <h2>Glifi Fonetici KryptoGram</h2>
             </div>
             <div class="panel-controls">
               <span class="char-count" id="outputGlyphCount">0 glifi</span>
@@ -678,10 +690,10 @@
   <footer class="app-footer">
     <div class="footer-container">
       <div class="footer-col">
-        <span>NEXA-S // Sovereign Cryptographic Framework</span>
+        <span>KryptoGram // Sovereign Cryptographic Framework</span>
       </div>
       <div class="footer-col text-center">
-        <span>Fonetica Simbolica + XChaCha20-Poly1305 + Argon2id</span>
+        <span>Kryptós + Grámma &bull; XChaCha20-Poly1305 &bull; Argon2id &bull; ML-KEM-768</span>
       </div>
       <div class="footer-col text-right">
         <span>Conforme a <strong>1_DESIGN</strong> &bull; Framework Operativo</span>

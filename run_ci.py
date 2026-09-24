@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""NEXA-S v2.0 — Local CI/CD Pipeline & Audit Runner.
+"""KryptoGram v2.0 — Local CI/CD Pipeline & Audit Runner.
+(dal greco: Kryptós = Nascosto, Grámma = Scrittura)
 
 Esegue in locale l'intera pipeline di Continuous Integration conforme al
 Framework Operativo (Tier CRITICO):
-1. Test suite completa (pytest: fonetica, crittografia v2, container NXS2, CycleLab integration)
+1. Test suite completa (pytest: fonetica, crittografia v2, container NXS2, CycleLab integration, advanced pillars)
 2. Validazione di resilienza e Chaos test (bit-flip rejection)
 3. Audit di sicurezza e controllo zero-secret in memoria
 4. Scorecard di conformità finale
@@ -47,8 +48,8 @@ def main() -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
 
-    print_header("NEXA-S v2.0 // LOCAL CI RUNNER (Framework Operativo)")
-    print("Modalità: Repository Privato (Zero Public Leakage)")
+    print_header("KryptoGram v2.0 // LOCAL CI RUNNER (Framework Operativo)")
+    print("Architettura: Sovereign Keyed Conlang & Post-Quantum Enclave")
     print("Ambiente Python:", sys.version.split()[0])
 
     stages = [
@@ -95,11 +96,11 @@ def main() -> None:
             if not ok:
                 all_ok = False
 
-    print_header("ESITO PIPELINE CI NEXA-S v2.0")
+    print_header("ESITO PIPELINE CI KRYPTOGRAM v2.0")
     if all_ok:
         print("  STATO: TUTTI GLI STAGE SUPERATI CON SUCCESSO ✓")
         print("  CONFORMITÀ: 1_DESIGN (9 Pilastri) & 2_EXECUTION (DoD Tier CRITICO)")
-        print("  SECURITY GRADE: MAXIMUM SECURITY (Post-Quantum & Asymmetric Ready)")
+        print("  SECURITY GRADE: MAXIMUM SECURITY (Keyed Dynamic Alphabet & PQC Enclave)")
         sys.exit(0)
     else:
         print("  STATO: ERRORI RILEVATI DURANTE LA PIPELINE ✗")

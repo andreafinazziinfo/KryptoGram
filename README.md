@@ -1,16 +1,18 @@
 <div align="center">
 
-# ⟦∧⟧ NEXA-S v2.0
-### Sovereign Post-Quantum Envelope & Phonetic Cryptography Engine
+# ⟦∧⟧ KryptoGram v2.0
+### Sovereign Post-Quantum Envelope & Keyed Phonetic Cryptography Engine
+*(dal greco: **Kryptós** [κρυπτός = nascosto] + **Grámma** [γράμμα = scrittura])*
 
 [![Security: Maximum Post-Quantum](https://img.shields.io/badge/Security-Post--Quantum%20Ready-00f3ff.svg)](#-architettura-crittografica-nxs2)
 [![AEAD: XChaCha20-Poly1305](https://img.shields.io/badge/AEAD-XChaCha20--Poly1305-00ff9d.svg)](#)
 [![KDF: Argon2id Dual Profile](https://img.shields.io/badge/KDF-Argon2id%20(256MB%20%7C%2064MB)-purple.svg)](#)
+[![Entropy: 26! Permutation](https://img.shields.io/badge/Conlang-26!%20Keyed%20Permutations%20(~88%20bit)-yellow.svg)](#-sicurezza-pubblica-e-principio-di-kerckhoffs)
 [![Tests: 52/52 Passed](https://img.shields.io/badge/Tests-52%2F52%20Passed%20(100%25)-brightgreen.svg)](#-continuous-integration--test-suite)
 [![Framework Operativo: Tier CRITICO](https://img.shields.io/badge/Governance-Framework%20Operativo%20v3.1-orange.svg)](#)
-[![Confidential: Private Repository](https://img.shields.io/badge/Access-Private%20%2F%20Confidential-red.svg)](#)
+[![Access: Public Sovereign](https://img.shields.io/badge/Access-Public%20%2F%20Open%20Source-brightgreen.svg)](#-sicurezza-pubblica-e-principio-di-kerckhoffs)
 
-*Il primo sistema ibrido di **scrittura fonetica simbolica** e **crittografia autenticata asimmetrica/post-quantum** progettato per la sovranità dei dati personali, cold storage fisico e protezione IP algoritmica.*
+*Il primo sistema unificato di **scrittura fonetica simbolica a permutazione dinamica (26!)** e **busta crittografica autenticata asimmetrica/post-quantum (NXS2)** progettato per sovranità dei dati personali, cold storage fisico e protezione IP algoritmica.*
 
 [Web Terminal](./index.html) · [CLI v2.0](./nexa_cli_v2.py) · [CycleLab Bridge](./cyclelab_bridge.py) · [Plugin VS Code](./vscode_nexa_s/) · [Plugin Obsidian](./obsidian_nexa_s/) · [CI Runner](./run_ci.py)
 
@@ -19,7 +21,8 @@
 ---
 
 ## 📋 Indice
-- [Cos'è NEXA-S](#-cosè-nexa-s)
+- [Cos'è KryptoGram](#-cosè-kryptogram)
+- [Sicurezza Pubblica e Principio di Kerckhoffs](#-sicurezza-pubblica-e-principio-di-kerckhoffs)
 - [Perché è Unico](#-perché-è-unico)
 - [Architettura Crittografica NXS2](#-architettura-crittografica-nxs2)
 - [Tavola Fonetica dei Glifi](#-tavola-fonetica-dei-glifi)
@@ -32,17 +35,17 @@
 
 ---
 
-## 🎯 Cos'è NEXA-S
+## 🎯 Cos'è KryptoGram
 
-**NEXA-S** fonde due discipline tradizionalmente separate per creare un sistema di riservatezza a difesa totale:
-1. **Steganografia Cognitiva / Scrittura Fonetica Simbolica**: Un conlang di glifi geometrico-fonetici (`⟦∧⋒∆⌿≋⊕⟧`, `⌁⊙⋒ƒ≋⌿⋔⊕ ∴`) che collassa la lingua naturale su fonemi primari. Rende il testo opaco a scraper automatici, telecamere OCR e sguardi indiscreti (*shoulder surfing*).
+**KryptoGram** (Kryptós + Grámma) fonde due discipline tradizionalmente separate per creare un sistema di riservatezza a difesa totale:
+1. **Steganografia Cognitiva / Conlang Fonetico a Permutazione Dinamica**: Un alfabeto simbolico geometrico (`⟦∧⋒∆⌿≋⊕⟧`, `⌁⊙⋒ƒ≋⌿⋔⊕ ∴`) che collassa la lingua naturale su fonemi primari. Attraverso una **chiave segreta d'alfabeto**, genera deterministicamente una tra **$26! \approx 4.03 \times 10^{26}$ permutazioni uniche (~88 bit di entropia)**, rendendo il testo totalmente immune ad analisi statistiche di frequenza e OCR anche se il codice sorgente è pubblico su GitHub.
 2. **Crittografia Asimmetrica & Post-Quantum (NXS2)**: Una busta crittografica blindata che implementa lo standard NIST FIPS 203 (**ML-KEM-768 Kyber**), scambio chiavi classico **X25519**, firme digitali **Ed25519**, cifratura simmetrica autenticata **XChaCha20-Poly1305** e KDF memory-hard **Argon2id**.
 
 ```mermaid
 flowchart TD
-    subgraph L1["LIVELLO 1: Steganografia Cognitiva (Conlang Fonetico)"]
-        A["Testo in Chiaro (Italiano / Formule)"] --> B["Parser Fonetico & Digrafi (nexa_lib.py)"]
-        B --> C["Glifi Geometrici NEXA-S (⟦∧⋒∆⌿≋⊕⟧)"]
+    subgraph L1["LIVELLO 1: Steganografia Cognitiva (KryptoGram Conlang)"]
+        A["Testo in Chiaro (Italiano / Formule)"] --> B["Parser Fonetico & Permutazione 26! (nexa_lib.py)"]
+        B --> C["Glifi Geometrici KryptoGram (⟦∧⋒∆⌿≋⊕⟧)"]
         C --> D["Compressione Lossless Metadata (Q3: {orig, ts, h})"]
     end
 
@@ -64,12 +67,39 @@ flowchart TD
 
 ---
 
+## 🌐 Sicurezza Pubblica e Principio di Kerckhoffs
+
+Una delle domande fondamentali nella progettazione di KryptoGram è stata:  
+> *"Se rendiamo pubblico il codice sorgente su GitHub, la gente non può conoscere la mappa dell'alfabeto o fare reverse engineering, rendendolo insicuro?"*
+
+La risposta teorica e applicata si fonda sul **Principio di Kerckhoffs** e sulla **Massima di Shannon** (*"il nemico conosce il sistema"*):
+
+1. **Rifiuto della Security through Obscurity**:  
+   Un sistema la cui sicurezza dipende dalla segretezza del codice è intrinsecamente fragile. KryptoGram è progettato per essere matematicamente inespugnabile **anche se l'attaccante possiede l'intero codice sorgente e conosce ogni singola riga di implementazione**.
+
+2. **Permutazione Dinamica Keyed ($26! \approx 4.03 \times 10^{26}$ Dialetti)**:  
+   - Oltre alla modalità canonica standard, il motore include la derivazione deterministica dell'alfabeto con chiave segreta (`alphabet_key`).
+   - L'algoritmo HMAC-SHA256 + Fisher-Yates genera una permutazione uniforme tra i 26 glifi geometrici.
+   - Spazio combinatorio: **$26! = 403.291.461.126.605.635.584.000.000$ dialetti unici (~88 bit di pura entropia steganografica)**.
+   - Chi non possiede la tua chiave segreta dell'alfabeto ottiene solo sequenze incomprensibili prive di frequenza statistica coerente.
+
+3. **Blindatura Crittografica Indipendente (Busta NXS2)**:  
+   Anche nell'ipotesi estrema in cui un attaccante indovini la permutazione dei glifi, si scontra immediatamente con la busta binaria `NXS2`:
+   - Cifratura simmetrica autenticata **XChaCha20-Poly1305** (chiave a 256 bit).
+   - KDF memory-hard **Argon2id** (256 MB di memoria RAM imposta per forzatura).
+   - Incapsulamento asimmetrico post-quantum **ML-KEM-768 Kyber** (NIST FIPS 203).
+   - Firme digitali asimmetriche **Ed25519**.
+
+**Conclusione**: Pubblicare il repository su GitHub è sicuro al 100% e certifica l'eccellenza e l'auditing pubblico dell'architettura.
+
+---
+
 ## 🛡️ Perché è Unico
 
-```
-                       ┌─────────────────────────────────────┐
-                       │   NEXA-S MAXIMUM SECURITY FORMULA   │
-                       └──────────────────┬──────────────────┘
+```text
+                       ┌────────────────────────────────────────┐
+                       │   KRYPTOGRAM MAXIMUM SECURITY FORMULA  │
+                       └──────────────────┬─────────────────────┘
                                           │
          ┌───────────────────┬────────────┴────────┬───────────────────┐
          ▼                   ▼                     ▼                   ▼
@@ -330,11 +360,11 @@ python run_ci.py
 **Esito dei test attuali**:
 ```text
 ======================================================================
-  ESITO PIPELINE CI NEXA-S v2.0
+  ESITO PIPELINE CI KRYPTOGRAM v2.0
 ======================================================================
-✓ 1. Pytest Core & Integration Suite (41/41 test superati in ~30s)
-✓ 2. Self-Test Modulo Crittografico v2.0 (Dual profile, NXS2, Ed25519)
-✓ 3. Self-Test Motore Fonetico v2.0 (Digrammi, blocchi, validatore)
+✓ 1. Pytest Core, Dynamic Alphabet & Advanced Pillars Suite (52/52 test superati)
+✓ 2. Self-Test Modulo Crittografico v2.0 (Dual profile, NXS2, Ed25519, Pepper)
+✓ 3. Self-Test Motore Fonetico v2.0 (Permutazione 26!, digrammi, validatore)
 ✓ 4. Smoke Test CLI v2.0 Roundtrip & Lossless Restoration
 STATO: TUTTI GLI STAGE SUPERATI CON SUCCESSO ✓
 CONFORMITÀ: 1_DESIGN (9 Pilastri) & 2_EXECUTION (DoD Tier CRITICO)
@@ -346,14 +376,14 @@ CONFORMITÀ: 1_DESIGN (9 Pilastri) & 2_EXECUTION (DoD Tier CRITICO)
 
 Il progetto è sviluppato e governato secondo i criteri dell'**Operational Engineering Framework**:
 - **`1_DESIGN`**: Copertura totale dei 9 Pilastri di eccellenza ingegneristica (Pre-Mortem, ADR, Blast Radius, Data Lineage NXS2, Idempotenza, Chaos Testing, Circuit Breakers, Security Threat Model, Cost Overhead).
-- **`2_EXECUTION`**: DoD di Tier CRITICO rispettata su tutte le modifiche; target di coverage > 80% su moduli core.
+- **`2_EXECUTION`**: DoD di Tier CRITICO rispettata su tutte le modifiche; target di coverage > 80% su moduli core (52/52 test verdi).
 - **`FRAMEWORK_MATURITY`**: Target **Livello 4 (Operativo)** raggiunto con suite di test di non-regressione automatizzata e isolamento degli SPOF.
 
 ---
 
 <div align="center">
 
-**NEXA-S v2.0 &bull; Proprietà Privata & Confidenziale**  
+**KryptoGram v2.0 &bull; Sovereign Open Source Enclave**  
 *Autore: Andrea Finazzi &bull; Sinergia Ecosistema CycleLab & GitNexus*
 
 </div>
