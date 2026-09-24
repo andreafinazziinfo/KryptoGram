@@ -198,6 +198,23 @@ sequenceDiagram
     end
 ```
 
+### 🛡️ Matrice degli Usi: CycleLab, Chatbot, Keystore & Sovranità Esterna
+
+Il sistema fornisce protezione a 360° per l'intero ecosistema tecnologico e personale:
+* **Per CycleLab Terminal**:
+  1. *Confine IP Matassa Frozen*: Cifratura asimmetrica delle matrici di Fourier e pivot con padding a 8192 byte.
+  2. *Protezione Prompt & Chatbot*: Cifratura at-rest dei system prompts e offuscamento steganografico delle risposte RAG.
+  3. *Hardened Broker Keystore*: Archiviazione sicura di token JWT e chiavi API Binance/IBKR senza file `.env` in chiaro.
+  4. *Signal Bus Ed25519*: Ordini firmati asimmetricamente per neutralizzare attacchi di order-injection.
+  5. *Mobile Tactical HUD*: Notifiche e livelli su app Android formattati in glifi anti-shoulder surfing.
+  6. *Allineamento Piano 9P Anti-Scraping*: Evoluzione da HMAC simmetrico a busta NXS2 asimmetrica Post-Quantum.
+* **Per l'Uso Personale & Sovrano (Esterno a CycleLab)**:
+  1. *Cold Storage Fisico*: Incisione su piastra metallica di Seed Phrase (12/24 parole): un ladro vede disegni geometrici e non riconosce un wallet crypto.
+  2. *Obsidian & VS Code*: Cifratura di note sanitarie, brevetti, credenziali e frammenti di codice.
+  3. *Progetti Ecosistema*: Protezione dei disegni industriali di `titan-industrial-forge`, sessioni di `TV-Oracle-Bridge` e chiavi SSH di `oracle-monitoring`.
+
+📄 Per la scansione completa, i benchmark e l'analisi sul principio di Kerckhoffs (pubblico vs privato), consulta il documento dedicato: **[docs/USE_CASES_AND_INTEGRATION_MATRIX.md](./docs/USE_CASES_AND_INTEGRATION_MATRIX.md)** e il piano **[docs/plans/ANTISCRAPING_IP_DEFENSE_9P_PLAN.md](./docs/plans/ANTISCRAPING_IP_DEFENSE_9P_PLAN.md)**.
+
 ---
 
 ## 🗺️ Mappa Architetturale GitNexus
