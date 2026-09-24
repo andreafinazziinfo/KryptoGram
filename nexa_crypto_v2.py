@@ -104,13 +104,28 @@ KDF_PARAMS = {
 }
 
 
-def derive_key_argon2id(passphrase: str, salt: bytes, profile: KDFProfile = KDFProfile.DESKTOP_VAULT) -> bytes:
-    """Deriva una chiave a 256 bit usando Argon2id con il profilo indicato (o fallback PBKDF2)."""
+def derive_key_argon2id(
+    passphrase: str,
+    salt: bytes,
+    profile: KDFProfile = KDFProfile.DESKTOP_VAULT,
+    pepper: bytes | None = None,
+) -> bytes:
+    """Deriva una chiave a 256 bit usando Argon2id con il profilo indicato (o fallback PBKDF2).
+
+    Se pepper è specificato (chiave segreta d'infrastruttura/HSM), viene applicato tramite
+    HMAC-SHA256 prima della KDF per proteggere da leak di database (Defense-in-Depth).
+    """
+    import hashlib
+    import hmac
+
     params = KDF_PARAMS.get(profile, KDF_PARAMS[KDFProfile.DESKTOP_VAULT])
+    secret_bytes = passphrase.encode("utf-8")
+    if pepper is not None:
+        secret_bytes = hmac.new(pepper, secret_bytes, hashlib.sha256).digest()
 
     if ARGON2_AVAILABLE:
         return hash_secret_raw(
-            secret=passphrase.encode("utf-8"),
+            secret=secret_bytes,
             salt=salt,
             time_cost=params["time_cost"],
             memory_cost=params["memory_cost"],
@@ -120,8 +135,38 @@ def derive_key_argon2id(passphrase: str, salt: bytes, profile: KDFProfile = KDFP
         )
     else:
         # Fallback conforme a OWASP con 600.000 iterazioni
-        import hashlib
-        return hashlib.pbkdf2_hmac("sha256", passphrase.encode("utf-8"), salt, 600000, dklen=KEY_LEN)
+        return hashlib.pbkdf2_hmac("sha256", secret_bytes, salt, 600000, dklen=KEY_LEN)
+
+
+def generate_system_enclave_code() -> str:
+    """Genera un codice algoritmico di sistema ad alta entropia (128 bit).
+
+    Formato: NXS-XXXX-XXXX-XXXX-XXXX (stile Secret Key / Enclave Token).
+    Garantisce che anche con una password utente debole, la credenziale combinata
+    abbia almeno 128 bit di entropia crittografica certificata.
+    """
+    import secrets
+
+    raw = secrets.token_hex(16).upper()
+    chunks = [raw[i : i + 4] for i in range(0, len(raw), 4)]
+    return f"NXS-{'-'.join(chunks)}"
+
+
+def derive_dual_part_credential(
+    user_passphrase: str,
+    system_code: str,
+    salt: bytes,
+    pepper: bytes | None = None,
+    profile: KDFProfile = KDFProfile.DESKTOP_VAULT,
+) -> bytes:
+    """Deriva una chiave ad altissima entropia combinando:
+    1. Parte utente (passphrase mnemonica)
+    2. Parte algoritmica di sistema (token a 128 bit / Secret Key)
+    3. Salt crittografico per-account
+    4. Pepper d'infrastruttura (HSM / Secret d'ambiente)
+    """
+    combined_secret = f"{user_passphrase}::{system_code}"
+    return derive_key_argon2id(combined_secret, salt, profile=profile, pepper=pepper)
 
 
 def hash_blake3(data: bytes) -> bytes:
