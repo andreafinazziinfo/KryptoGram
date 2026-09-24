@@ -10,6 +10,7 @@
 [![Entropy: 26! Permutation](https://img.shields.io/badge/Conlang-26!%20Keyed%20Permutations%20(~88%20bit)-yellow.svg)](#-sicurezza-pubblica-e-principio-di-kerckhoffs)
 [![Tests: 52/52 Passed](https://img.shields.io/badge/Tests-52%2F52%20Passed%20(100%25)-brightgreen.svg)](#-continuous-integration--test-suite)
 [![Framework Operativo: Tier CRITICO](https://img.shields.io/badge/Governance-Framework%20Operativo%20v3.1-orange.svg)](#)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 [![Access: Public Sovereign](https://img.shields.io/badge/Access-Public%20%2F%20Open%20Source-brightgreen.svg)](#-sicurezza-pubblica-e-principio-di-kerckhoffs)
 
 *Il primo sistema unificato di **scrittura fonetica simbolica a permutazione dinamica (26!)** e **busta crittografica autenticata asimmetrica/post-quantum (NXS2)** progettato per sovranità dei dati personali, cold storage fisico e protezione IP algoritmica.*
@@ -32,6 +33,7 @@
 - [Quick Start](#-quick-start)
 - [Continuous Integration & Test Suite](#-continuous-integration--test-suite)
 - [Governance & Framework Operativo](#-governance--framework-operativo)
+- [Licenza](#-licenza)
 
 ---
 
@@ -386,6 +388,19 @@ Il progetto è sviluppato e governato secondo i criteri dell'**Operational Engin
 - **`1_DESIGN`**: Copertura totale dei 9 Pilastri di eccellenza ingegneristica (Pre-Mortem, ADR, Blast Radius, Data Lineage NXS2, Idempotenza, Chaos Testing, Circuit Breakers, Security Threat Model, Cost Overhead).
 - **`2_EXECUTION`**: DoD di Tier CRITICO rispettata su tutte le modifiche; target di coverage > 80% su moduli core (52/52 test verdi).
 - **`FRAMEWORK_MATURITY`**: Target **Livello 4 (Operativo)** raggiunto con suite di test di non-regressione automatizzata e isolamento degli SPOF.
+
+---
+
+## 📄 Licenza
+
+Questo progetto è distribuito con licenza **Apache License 2.0**.  
+Consulta il file [LICENSE](./LICENSE) per i termini legali completi.
+
+> **Garanzie e Tutele della Licenza Apache 2.0 per KryptoGram:**
+> - **Libertà di Adozione Commerciale e Privata**: Chiunque può utilizzare, integrare e distribuire il software in forma libera o proprietaria.
+> - **Protezione Brevetti (Patent Grant)**: Concessione esplicita e irrevocabile di licenza sui brevetti coperti dal codice, con clausola di ritorsione difensiva (*patent retaliation clause*) a tutela del creatore e degli utilizzatori.
+> - **Tutela del Marchio (Trademark Protection)**: La licenza non autorizza l'uso dei marchi o dei nomi commerciali *KryptoGram* e *CycleLab* per promuovere prodotti derivati senza autorizzazione espressa.
+> - **Attribuzione e Modifiche Tracciate**: Obbligo di mantenere le note di copyright originali e dichiarare chiaramente i file modificati.
 
 ---
 

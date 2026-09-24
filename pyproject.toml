@@ -7,14 +7,14 @@ name = "kryptogram"
 version = "1.0.0"
 description = "KryptoGram: Sovereign Post-Quantum Cryptographic Envelope & Keyed Phonetic Conlang"
 readme = "README.md"
-license = {text = "MIT"}
+license = {text = "Apache-2.0"}
 requires-python = ">=3.10"
 authors = [{name = "Andrea Finazzi"}]
 keywords = ["cryptography", "phonetic", "conlang", "post-quantum", "kyber", "xchacha20", "kryptogram"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
