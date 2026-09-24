@@ -38,6 +38,30 @@
 1. **Steganografia Cognitiva / Scrittura Fonetica Simbolica**: Un conlang di glifi geometrico-fonetici (`⟦∧⋒∆⌿≋⊕⟧`, `⌁⊙⋒ƒ≋⌿⋔⊕ ∴`) che collassa la lingua naturale su fonemi primari. Rende il testo opaco a scraper automatici, telecamere OCR e sguardi indiscreti (*shoulder surfing*).
 2. **Crittografia Asimmetrica & Post-Quantum (NXS2)**: Una busta crittografica blindata che implementa lo standard NIST FIPS 203 (**ML-KEM-768 Kyber**), scambio chiavi classico **X25519**, firme digitali **Ed25519**, cifratura simmetrica autenticata **XChaCha20-Poly1305** e KDF memory-hard **Argon2id**.
 
+```mermaid
+flowchart TD
+    subgraph L1["LIVELLO 1: Steganografia Cognitiva (Conlang Fonetico)"]
+        A["Testo in Chiaro (Italiano / Formule)"] --> B["Parser Fonetico & Digrafi (nexa_lib.py)"]
+        B --> C["Glifi Geometrici NEXA-S (⟦∧⋒∆⌿≋⊕⟧)"]
+        C --> D["Compressione Lossless Metadata (Q3: {orig, ts, h})"]
+    end
+
+    subgraph L2["LIVELLO 2: Busta Crittografica NXS2 (Post-Quantum Hybrid)"]
+        D --> E["Derivazione Chiavi KDF (Argon2id 256MB / 64MB)"]
+        E --> F["Scambio Asimmetrico Ibrido (ML-KEM-768 Kyber + X25519)"]
+        F --> G["Firma Digitale d'Autore (Ed25519 64B)"]
+        G --> H["Cifratura Autenticata AEAD (XChaCha20-Poly1305)"]
+        H --> I["Offuscamento Lunghezza Fissa (Zero-Padding 4096B / 8192B)"]
+    end
+
+    subgraph OUT["TARGET DI RILASCIO & CONSUMO"]
+        I --> J["File Busta Binaria (.nxs2 / Base64url)"]
+        I --> K["Enclave RAM CycleLab (Zeroing Volatile)"]
+        C --> L["Cold Storage Fisico (Incisione Metallo / Carta)"]
+        C --> M["HUD Mobile Android (Anti-Shoulder Surfing)"]
+    end
+```
+
 ---
 
 ## 🛡️ Perché è Unico
@@ -71,25 +95,29 @@
 
 Layout binario del contenitore `NXS2`:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│ Header Fisso (46 Byte)                                      │
-│ - Magic Header: "NXS2" (4 byte: 0x4E 0x58 0x53 0x32)        │
-│ - Versione: 0x02 (1 byte)                                   │
-│ - Flags: Bitmask PQ, Signed, Lossless, Mobile (1 byte)      │
-│ - Salt KDF: CSPRNG casuale (16 byte)                        │
-│ - Nonce IV: CSPRNG casuale (24 byte)                        │
-├─────────────────────────────────────────────────────────────┤
-│ Extra Sections (Opzionali su Flag)                          │
-│ - Post-Quantum Kyber-768 KEM Pubkey + Ciphertext (~2.3 KB)  │
-│ - Firma Digitale Ed25519 Verify Key + Sig (96 byte)         │
-├─────────────────────────────────────────────────────────────┤
-│ Inner Encrypted Bundle (XChaCha20-Poly1305)                 │
-│ - Metadata Chunk: Lunghezza (2B) + JSON {ts, orig, h, p}    │
-│ - Raw Payload (dati o glifi fonetici)                       │
-│ - Zero-Padding normalizzato a blocco fisso (es. 4096B)      │
-│ - Poly1305 / GMAC Authentication Tag (16 byte)              │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+classDiagram
+    direction TB
+    class Header_Fisso_46B {
+        +byte[4] magic = "NXS2" (0x4E 0x58 0x53 0x32)
+        +byte version = 0x02
+        +byte flags (Bitmask: PQ, Signed, Lossless, Mobile)
+        +byte[16] salt_kdf (CSPRNG casuale)
+        +byte[24] nonce_iv (CSPRNG casuale)
+    }
+    class Sezioni_Extra_Opzionali {
+        +KyberSection pq_kem (Pubkey + Ciphertext ~2.3 KB)
+        +Ed25519Section signature (VerifyKey 32B + Sig 64B)
+    }
+    class Inner_Encrypted_Bundle {
+        +uint16 metadata_length
+        +json lossless_metadata (Orig, Timestamp, Hash, Padding)
+        +byte[] payload (Glifi / Formule Matassa)
+        +byte[] zero_padding (Normalizzato a 4096B o 8192B)
+        +byte[16] poly1305_tag (Tag Autenticazione AEAD)
+    }
+    Header_Fisso_46B --> Sezioni_Extra_Opzionali : Flags Condition
+    Sezioni_Extra_Opzionali --> Inner_Encrypted_Bundle : Encrypted with XChaCha20
 ```
 
 ---
@@ -127,27 +155,78 @@ Il modulo nativo [cyclelab_bridge.py](./cyclelab_bridge.py) fornisce l'integrazi
 3. **Signal Bus Non Ripudiabile**: Ordini di compravendita firmati con Ed25519 per prevenire attacchi di *order-injection* tra bot di segnale ed esecutore broker.
 4. **Tactical Mobile HUD**: Formattazione discreta degli allarmi ciclici per l'app Android ([CycleLab-Terminal-mobile-v32.apk](file:///C:/Users/Andrea/Desktop/Cycle%20Lab%20App%20mobile)), proteggendo la strategia da chi osserva lo schermo in pubblico.
 
+### Workflow 1: Protezione IP Matassa & Bonifica RAM
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Quant as Ricercatore Quantitativo
+    participant Bridge as cyclelab_bridge.py
+    participant Enclave as Enclave NXS2 (Disk/Transit)
+    participant Engine as CycleQuant Engine (RAM)
+
+    Quant->>Bridge: package_frozen_ip(formula, passphrase, pad=8192)
+    Bridge->>Bridge: Derivazione Argon2id (256MB) + XChaCha20-Poly1305
+    Bridge->>Enclave: Scrittura file protetto (.nxs2)
+    Note over Enclave: Zero-knowledge a riposo: protetto contro furto IP
+    Engine->>Bridge: load_frozen_ip_to_ram(container_path, passphrase)
+    Bridge->>Bridge: Decifratura in memoria volatile + verifica integrità
+    Bridge->>Engine: Iniezione dizionario pesi e matrici di calcolo
+    Bridge->>Bridge: secure_zero(chiavi, buffer intermedi)
+    Note over Engine: RAM protetta con bonifica immediata dei residui
+```
+
+### Workflow 2: Trading Signal Bus con Firme Digitali Ed25519
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Strategy as Strategia Ciclica CycleLab
+    participant Bus as Signal Bus Bridge
+    participant Gateway as Execution Broker Gateway
+    participant Exchange as Broker API (Binance/IBKR)
+
+    Strategy->>Bus: create_signed_order(BUY 0.5 BTC, signing_key)
+    Bus->>Bus: Generazione firma Ed25519 (64B) + SHA-512
+    Bus->>Gateway: Invio payload ordine + firma digitale
+    Gateway->>Gateway: verify_order_signature(order_data, sig, verify_key)
+    alt Firma Valida
+        Gateway->>Exchange: Inoltro ordine a mercato autenticato
+        Exchange-->>Gateway: Execution Report (Filled)
+    else Firma Corrotta o Iniezione Maliziosa
+        Gateway->>Gateway: Rifiuto immediato (Drop packet + Alert sicurezza)
+    end
+```
+
 ---
 
 ## 🗺️ Mappa Architetturale GitNexus
 
 Topologia registrata sul server locale **GitNexus** (`http://localhost:4747/`):
 
-```
-[GitNexus Hub: http://localhost:4747/]
-  │
-  ├── project: CycleQuant-Terminal
-  │     ├── imports ──► nexa-vault (gestione credenziali broker)
-  │     └── imports ──► matassa-frozen (modelli ciclici protetti NXS2)
-  │
-  ├── project: nexa-s-core (QUESTO REPOSITORY)
-  │     ├── module: nexa_lib.py (parser fonetico & sintassi)
-  │     ├── module: nexa_crypto_v2.py (PQC Kyber-768, X25519, Ed25519, AEAD)
-  │     ├── module: cyclelab_bridge.py (connettore di sicurezza quant)
-  │     └── interface: index.html (web terminal standalone)
-  │
-  └── project: control-plane
-        └── telemetry ──► log di audit cifrati con firme Ed25519
+```mermaid
+flowchart LR
+    subgraph GN["GitNexus Hub (http://localhost:4747/)"]
+        direction TB
+        CQT["CycleQuant-Terminal<br/><i>(Core Piattaforma Trading)</i>"]
+        NEXA["nexa-s-core<br/><i>(QUESTO REPOSITORY)</i>"]
+        CP["control-plane<br/><i>(Monitoraggio & Telemetria)</i>"]
+    end
+
+    subgraph MODULES["Moduli NEXA-S"]
+        LIB["nexa_lib.py<br/>(Parser Fonetico)"]
+        CRYPTO["nexa_crypto_v2.py<br/>(Motore PQC & NXS2)"]
+        BRIDGE["cyclelab_bridge.py<br/>(Connettore Quant)"]
+        UI["index.html<br/>(Web Terminal)"]
+    end
+
+    CQT -->|Imports: Credenziali Sicure| NEXA
+    CQT -->|Imports: Modelli Matassa Frozen| NEXA
+    NEXA --> LIB
+    NEXA --> CRYPTO
+    NEXA --> BRIDGE
+    NEXA --> UI
+    CP -->|Audit Logs Firmati Ed25519| NEXA
 ```
 
 ---

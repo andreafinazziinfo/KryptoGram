@@ -57,7 +57,7 @@ def main() -> None:
         ("3. Self-Test Motore Fonetico v2.0", [sys.executable, "nexa_lib.py"]),
         ("4. Smoke Test CLI v2.0 Roundtrip", [
             sys.executable, "nexa_cli_v2.py", "encrypt",
-            "--in", "SHOWCASE_nexa_texts.md",
+            "--in", "docs/showcase.md",
             "--out", "ci_temp.nexa",
             "--pad", "4096",
             "--profile", "desktop",

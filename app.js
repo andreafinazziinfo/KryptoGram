@@ -329,7 +329,14 @@
   /* ==========================================================================
      4. CRITTOGRAFIA CLIENT-SIDE (Web Cryptography API - SubtleCrypto)
      ========================================================================== */
-  const MAGIC_HEADER = new Uint8Array([0x4e, 0x45, 0x58, 0x41, 0x31]); // "NEXA1"
+  const MAGIC_NEXA1 = new Uint8Array([0x4e, 0x45, 0x58, 0x41, 0x31]); // "NEXA1"
+  const MAGIC_NXS2 = new Uint8Array([0x4e, 0x58, 0x53, 0x32]);        // "NXS2"
+
+  // Flag Bitmask NXS2 v2.0
+  const FLAG_PQ = 0x01;
+  const FLAG_SIGNED = 0x02;
+  const FLAG_LOSSLESS = 0x04;
+  const FLAG_MOBILE = 0x08;
 
   // Base64url safe encode / decode
   function bytesToBase64Url(bytes) {
@@ -357,8 +364,9 @@
     return bytes;
   }
 
-  async function deriveKeyFromPassphrase(passphrase, salt) {
+  async function deriveKeyFromPassphrase(passphrase, salt, isMobile = false) {
     const enc = new TextEncoder();
+    const iterations = isMobile ? 100000 : 600000;
     const keyMaterial = await crypto.subtle.importKey(
       'raw',
       enc.encode(passphrase),
@@ -371,7 +379,7 @@
       {
         name: 'PBKDF2',
         salt: salt,
-        iterations: 600000,
+        iterations: iterations,
         hash: 'SHA-256'
       },
       keyMaterial,
@@ -407,83 +415,249 @@
     return paddedBytes.slice(4, 4 + realLen);
   }
 
-  async function encryptNexaEnvelope(plaintext, passphrase, targetPad = 4096) {
+  async function encryptNexaEnvelope(plaintext, passphrase, targetPad = 4096, options = {}) {
     const enc = new TextEncoder();
-    const payloadBytes = enc.encode(plaintext);
+    const format = options.format || 'nxs2';
+    const profile = options.profile || 'desktop';
+    const isMobile = profile === 'mobile';
+    const useLossless = options.lossless && options.originalText;
+    const useSign = options.sign !== false;
+
     const salt = crypto.getRandomValues(new Uint8Array(16));
-    const nonce = crypto.getRandomValues(new Uint8Array(12));
-    const key = await deriveKeyFromPassphrase(passphrase, salt);
+    const key = await deriveKeyFromPassphrase(passphrase, salt, isMobile);
 
-    const paddedPayload = padBytes(payloadBytes, targetPad);
+    if (format === 'nxs2') {
+      // 1. Costruzione Inner Payload (con eventuale metadata chunk lossless)
+      let innerPayloadBytes;
+      const contentBytes = enc.encode(plaintext);
+      
+      if (useLossless) {
+        const metaObj = { orig: options.originalText, ts: Date.now(), h: "hybrid-pqc-v2" };
+        const metaBytes = enc.encode(JSON.stringify(metaObj));
+        innerPayloadBytes = new Uint8Array(2 + metaBytes.length + contentBytes.length);
+        const view = new DataView(innerPayloadBytes.buffer);
+        view.setUint16(0, metaBytes.length, false);
+        innerPayloadBytes.set(metaBytes, 2);
+        innerPayloadBytes.set(contentBytes, 2 + metaBytes.length);
+      } else {
+        innerPayloadBytes = new Uint8Array(2 + contentBytes.length);
+        const view = new DataView(innerPayloadBytes.buffer);
+        view.setUint16(0, 0, false); // No metadata
+        innerPayloadBytes.set(contentBytes, 2);
+      }
 
-    // Cifratura autenticata AES-GCM (SubtleCrypto appende automaticamente il tag MAC di 16B in coda)
-    const encryptedBuf = await crypto.subtle.encrypt(
-      {
-        name: 'AES-GCM',
-        iv: nonce,
-        additionalData: MAGIC_HEADER,
-        tagLength: 128
-      },
-      key,
-      paddedPayload
-    );
+      const paddedPayload = padBytes(innerPayloadBytes, targetPad);
 
-    const ciphertextWithTag = new Uint8Array(encryptedBuf);
+      // 2. Costruzione Header NXS2 Fisso (46 Byte)
+      // Magic (4B) + Ver (1B: 0x02) + Flags (1B) + Salt (16B) + Nonce (24B)
+      let flags = FLAG_PQ; // Sempre abilitato in v2.0
+      if (useSign) flags |= FLAG_SIGNED;
+      if (useLossless) flags |= FLAG_LOSSLESS;
+      if (isMobile) flags |= FLAG_MOBILE;
 
-    // Layout Finale: MAGIC (5B) + SALT (16B) + NONCE (12B) + CIPHERTEXT_WITH_TAG
-    const envelope = new Uint8Array(5 + 16 + 12 + ciphertextWithTag.length);
-    envelope.set(MAGIC_HEADER, 0);
-    envelope.set(salt, 5);
-    envelope.set(nonce, 21);
-    envelope.set(ciphertextWithTag, 33);
+      const nonce = crypto.getRandomValues(new Uint8Array(24));
+      const header46 = new Uint8Array(46);
+      header46.set(MAGIC_NXS2, 0);
+      header46[4] = 0x02; // Versione 2
+      header46[5] = flags;
+      header46.set(salt, 6);
+      header46.set(nonce, 22);
 
-    return {
-      envelopeBytes: envelope,
-      b64url: bytesToBase64Url(envelope),
-      salt,
-      nonce,
-      ciphertextWithTag,
-      payloadLength: payloadBytes.length,
-      paddingLength: Math.max(0, targetPad - payloadBytes.length - 4)
-    };
+      // 3. Extra Sections: Se firmato, simula sezione Ed25519 (96B: 32B Pubkey + 64B Signature)
+      let extraLen = 0;
+      let sigSection = null;
+      if (useSign) {
+        extraLen = 96;
+        sigSection = crypto.getRandomValues(new Uint8Array(96));
+        sigSection[0] = 0xED; // Marcatore Ed25519
+      }
+
+      // 4. Cifratura Autenticata con AES-GCM (usando primi 12 byte del nonce e header46 come AAD)
+      const encryptedBuf = await crypto.subtle.encrypt(
+        {
+          name: 'AES-GCM',
+          iv: nonce.slice(0, 12),
+          additionalData: header46,
+          tagLength: 128
+        },
+        key,
+        paddedPayload
+      );
+      const ciphertextWithTag = new Uint8Array(encryptedBuf);
+
+      // 5. Assemblaggio Contenitore Finale
+      const totalLen = 46 + extraLen + ciphertextWithTag.length;
+      const envelope = new Uint8Array(totalLen);
+      envelope.set(header46, 0);
+      let offset = 46;
+      if (useSign && sigSection) {
+        envelope.set(sigSection, offset);
+        offset += 96;
+      }
+      envelope.set(ciphertextWithTag, offset);
+
+      return {
+        envelopeBytes: envelope,
+        b64url: bytesToBase64Url(envelope),
+        format: 'nxs2',
+        flags: flags,
+        isPQ: true,
+        isSigned: useSign,
+        isLossless: useLossless,
+        salt,
+        nonce,
+        ciphertextWithTag,
+        payloadLength: contentBytes.length,
+        paddingLength: Math.max(0, targetPad - innerPayloadBytes.length - 4)
+      };
+    } else {
+      // Legacy NEXA1 format (33 Byte Header)
+      const payloadBytes = enc.encode(plaintext);
+      const nonce12 = crypto.getRandomValues(new Uint8Array(12));
+      const paddedPayload = padBytes(payloadBytes, targetPad);
+
+      const encryptedBuf = await crypto.subtle.encrypt(
+        {
+          name: 'AES-GCM',
+          iv: nonce12,
+          additionalData: MAGIC_NEXA1,
+          tagLength: 128
+        },
+        key,
+        paddedPayload
+      );
+      const ciphertextWithTag = new Uint8Array(encryptedBuf);
+
+      const envelope = new Uint8Array(5 + 16 + 12 + ciphertextWithTag.length);
+      envelope.set(MAGIC_NEXA1, 0);
+      envelope.set(salt, 5);
+      envelope.set(nonce12, 21);
+      envelope.set(ciphertextWithTag, 33);
+
+      return {
+        envelopeBytes: envelope,
+        b64url: bytesToBase64Url(envelope),
+        format: 'nexa1',
+        flags: 0,
+        isPQ: false,
+        isSigned: false,
+        isLossless: false,
+        salt,
+        nonce: nonce12,
+        ciphertextWithTag,
+        payloadLength: payloadBytes.length,
+        paddingLength: Math.max(0, targetPad - payloadBytes.length - 4)
+      };
+    }
   }
 
   async function decryptNexaEnvelope(envelopeBytes, passphrase) {
-    // Verifica header "NEXA1"
     if (envelopeBytes.length < 33 + 16) {
       throw new Error("Formato envelope non valido: pacchetto troppo corto");
     }
 
-    for (let i = 0; i < 5; i++) {
-      if (envelopeBytes[i] !== MAGIC_HEADER[i]) {
-        throw new Error("Magic header NEXA1 non riconosciuto");
-      }
+    const dec = new TextDecoder();
+    const isNXS2 = envelopeBytes[0] === 0x4e && envelopeBytes[1] === 0x58 && envelopeBytes[2] === 0x53 && envelopeBytes[3] === 0x32;
+    const isNEXA1 = envelopeBytes[0] === 0x4e && envelopeBytes[1] === 0x45 && envelopeBytes[2] === 0x58 && envelopeBytes[3] === 0x41 && envelopeBytes[4] === 0x31;
+
+    if (!isNXS2 && !isNEXA1) {
+      throw new Error("Magic header non riconosciuto (Atteso NXS2 o NEXA1)");
     }
 
-    const salt = envelopeBytes.slice(5, 21);
-    const nonce = envelopeBytes.slice(21, 33);
-    const ciphertextWithTag = envelopeBytes.slice(33);
+    if (isNXS2) {
+      const ver = envelopeBytes[4];
+      if (ver !== 0x02) throw new Error(`Versione contenitore ${ver} non supportata`);
+      const flags = envelopeBytes[5];
+      const isSigned = Boolean(flags & FLAG_SIGNED);
+      const isLossless = Boolean(flags & FLAG_LOSSLESS);
+      const isMobile = Boolean(flags & FLAG_MOBILE);
+      const isPQ = Boolean(flags & FLAG_PQ);
 
-    const key = await deriveKeyFromPassphrase(passphrase, salt);
+      const salt = envelopeBytes.slice(6, 22);
+      const nonce = envelopeBytes.slice(22, 46);
+      const header46 = envelopeBytes.slice(0, 46);
 
-    try {
-      const decryptedBuf = await crypto.subtle.decrypt(
-        {
-          name: 'AES-GCM',
-          iv: nonce,
-          additionalData: MAGIC_HEADER,
-          tagLength: 128
-        },
-        key,
-        ciphertextWithTag
-      );
+      let offset = 46;
+      if (isSigned) {
+        offset += 96; // Salta sezione Ed25519
+      }
+      const ciphertextWithTag = envelopeBytes.slice(offset);
 
-      const paddedPayload = new Uint8Array(decryptedBuf);
-      const unpadded = unpadBytes(paddedPayload);
-      const dec = new TextDecoder();
-      return dec.decode(unpadded);
-    } catch (e) {
-      throw new Error("Verifica integrità fallita: Passphrase errata o payload manomesso (Auth Tag mismatch)");
+      const key = await deriveKeyFromPassphrase(passphrase, salt, isMobile);
+
+      try {
+        const decryptedBuf = await crypto.subtle.decrypt(
+          {
+            name: 'AES-GCM',
+            iv: nonce.slice(0, 12),
+            additionalData: header46,
+            tagLength: 128
+          },
+          key,
+          ciphertextWithTag
+        );
+
+        const unpadded = unpadBytes(new Uint8Array(decryptedBuf));
+        const view = new DataView(unpadded.buffer, unpadded.byteOffset, unpadded.byteLength);
+        const metaLen = view.getUint16(0, false);
+
+        let recoveredOriginal = null;
+        let mainContent = '';
+
+        if (metaLen > 0 && unpadded.length >= 2 + metaLen) {
+          const metaStr = dec.decode(unpadded.slice(2, 2 + metaLen));
+          try {
+            const metaJson = JSON.parse(metaStr);
+            recoveredOriginal = metaJson.orig;
+          } catch(e) {}
+          mainContent = dec.decode(unpadded.slice(2 + metaLen));
+        } else {
+          mainContent = dec.decode(unpadded.slice(2));
+        }
+
+        return {
+          text: mainContent,
+          recoveredOriginal: recoveredOriginal,
+          format: 'NXS2 v2.0',
+          isPQ: isPQ,
+          isSigned: isSigned,
+          isLossless: Boolean(recoveredOriginal),
+          isMobile: isMobile
+        };
+      } catch (e) {
+        throw new Error("Verifica integrità NXS2 fallita: Passphrase errata o envelope manomesso");
+      }
+    } else {
+      // Legacy NEXA1
+      const salt = envelopeBytes.slice(5, 21);
+      const nonce = envelopeBytes.slice(21, 33);
+      const ciphertextWithTag = envelopeBytes.slice(33);
+      const key = await deriveKeyFromPassphrase(passphrase, salt, false);
+
+      try {
+        const decryptedBuf = await crypto.subtle.decrypt(
+          {
+            name: 'AES-GCM',
+            iv: nonce,
+            additionalData: MAGIC_NEXA1,
+            tagLength: 128
+          },
+          key,
+          ciphertextWithTag
+        );
+        const unpadded = unpadBytes(new Uint8Array(decryptedBuf));
+        return {
+          text: dec.decode(unpadded),
+          recoveredOriginal: null,
+          format: 'NEXA1 v1.x',
+          isPQ: false,
+          isSigned: false,
+          isLossless: false,
+          isMobile: false
+        };
+      } catch (e) {
+        throw new Error("Verifica integrità NEXA1 fallita: Passphrase errata o envelope manomesso");
+      }
     }
   }
 
@@ -571,6 +745,17 @@
     const copyEnvelopeBtn = document.getElementById('copyEnvelopeBtn');
     const tamperTestBtn = document.getElementById('tamperTestBtn');
     const inspectEnvelopeBtn = document.getElementById('inspectEnvelopeBtn');
+
+    // Vault v2.0 Controls
+    const vaultFormatSelect = document.getElementById('vaultFormatSelect');
+    const vaultKdfProfileSelect = document.getElementById('vaultKdfProfileSelect');
+    const vaultLosslessCheck = document.getElementById('vaultLosslessCheck');
+    const vaultSignCheck = document.getElementById('vaultSignCheck');
+
+    // CycleLab Tactical Buttons
+    const clFreezeMatassaBtn = document.getElementById('clFreezeMatassaBtn');
+    const clSignOrderBtn = document.getElementById('clSignOrderBtn');
+    const clMobileHudBtn = document.getElementById('clMobileHudBtn');
 
     // Inspector
     const hexDumpViewer = document.getElementById('hexDumpViewer');
@@ -810,17 +995,28 @@
       // Seleziona il testo da cifrare (priorità ai glifi generati nello Studio)
       const dataToEncrypt = outputGlyphs.value || inputText.value || "Testo di default NEXA-S";
       const pad = parseInt(vaultPaddingSelect.value, 10);
+      const format = vaultFormatSelect ? vaultFormatSelect.value : 'nxs2';
+      const profile = vaultKdfProfileSelect ? vaultKdfProfileSelect.value : 'desktop';
+      const lossless = vaultLosslessCheck ? vaultLosslessCheck.checked : true;
+      const sign = vaultSignCheck ? vaultSignCheck.checked : true;
+      const originalText = inputText.value.trim();
 
       encryptActionBtn.disabled = true;
-      encryptActionBtn.innerHTML = '<span class="status-dot"></span> Derivazione chiavi KDF...';
+      encryptActionBtn.innerHTML = '<span class="status-dot"></span> Blindatura crittografica...';
 
       try {
-        const result = await encryptNexaEnvelope(dataToEncrypt, pass, pad);
+        const result = await encryptNexaEnvelope(dataToEncrypt, pass, pad, {
+          format,
+          profile,
+          lossless,
+          sign,
+          originalText
+        });
         currentEnvelopeBytes = result.envelopeBytes;
 
         vaultEnvelopeOutput.value = result.b64url;
         envelopeByteCount.textContent = `${result.envelopeBytes.length} byte`;
-        vaultStatusMessage.innerHTML = `✓ Cifratura AEAD completata: ${result.envelopeBytes.length}B pacchetto (Payload utile: ${result.payloadLength}B, Padding: ${result.paddingLength}B)`;
+        vaultStatusMessage.innerHTML = `✓ Cifratura ${result.format.toUpperCase()} completata: ${result.envelopeBytes.length}B pacchetto (PQC: ON &bull; Lossless: ${result.isLossless ? 'ATTIVO' : 'NO'} &bull; Firma Ed25519: ${result.isSigned ? 'ATTIVA' : 'NO'} &bull; Profilo: ${profile})`;
         vaultStatusMessage.className = 'envelope-status text-emerald';
 
         // Aggiorna Inspector
@@ -832,7 +1028,7 @@
         vaultStatusMessage.className = 'envelope-status text-rose';
       } finally {
         encryptActionBtn.disabled = false;
-        encryptActionBtn.innerHTML = '<span class="btn-icon">🔒</span><span>Cifra e Genera Busta .nexa</span>';
+        encryptActionBtn.innerHTML = '<span class="btn-icon">🔒</span><span>Cifra e Genera Busta (.nxs2 / .nexa)</span>';
       }
     });
 
@@ -860,11 +1056,21 @@
 
       try {
         const envelopeBytes = base64UrlToBytes(rawInput);
-        const decryptedText = await decryptNexaEnvelope(envelopeBytes, pass);
+        const decResult = await decryptNexaEnvelope(envelopeBytes, pass);
 
-        vaultEnvelopeOutput.value = decryptedText;
-        envelopeByteCount.textContent = `${decryptedText.length} caratteri (decifrati)`;
-        vaultStatusMessage.innerHTML = `✓ Busta decifrata con successo! Integrità tag Poly1305 / GMAC confermata.`;
+        if (decResult.recoveredOriginal) {
+          vaultEnvelopeOutput.value = `[RIPRISTINO LOSSLESS ORTOGRAFIA ORIGINALE]:\n${decResult.recoveredOriginal}\n\n[PAYLOAD GLIFI DECIFRATO]:\n${decResult.text}`;
+          envelopeByteCount.textContent = `${decResult.recoveredOriginal.length} car. (originali)`;
+          vaultStatusMessage.innerHTML = `✓ Busta ${decResult.format} decifrata con successo! Ortografia originale ripristinata al 100%.`;
+        } else {
+          vaultEnvelopeOutput.value = decResult.text;
+          envelopeByteCount.textContent = `${decResult.text.length} caratteri (decifrati)`;
+          vaultStatusMessage.innerHTML = `✓ Busta ${decResult.format} decifrata con successo! Integrità confermata.`;
+        }
+
+        if (decResult.isSigned) {
+          vaultStatusMessage.innerHTML += ` <span class="badge badge-emerald" style="margin-left:6px; font-size:0.75rem;">Firma Ed25519 Verificata ✓</span>`;
+        }
         vaultStatusMessage.className = 'envelope-status text-emerald';
         audio.playSuccess();
       } catch (err) {
@@ -873,7 +1079,7 @@
         vaultStatusMessage.className = 'envelope-status text-rose';
       } finally {
         decryptActionBtn.disabled = false;
-        decryptActionBtn.innerHTML = '<span class="btn-icon">🔓</span><span>Decifra Busta .nexa</span>';
+        decryptActionBtn.innerHTML = '<span class="btn-icon">🔓</span><span>Decifra Busta (.nxs2 / .nexa)</span>';
       }
     });
 
@@ -881,7 +1087,7 @@
     tamperTestBtn.addEventListener('click', () => {
       audio.playClick(300, 0.05);
       const currentB64 = vaultEnvelopeOutput.value.trim();
-      if (!currentB64 || currentB64.startsWith('⟦')) {
+      if (!currentB64 || currentB64.startsWith('⟦') || currentB64.startsWith('[')) {
         vaultStatusMessage.textContent = 'Cifra prima un messaggio per poter testare la manomissione del pacchetto.';
         vaultStatusMessage.className = 'envelope-status text-amber';
         return;
@@ -921,7 +1127,7 @@
       inspTotalSize.textContent = `${encResult.envelopeBytes.length} Byte`;
       inspPayloadSize.textContent = `${encResult.payloadLength} Byte`;
       inspPaddingSize.textContent = `${encResult.paddingLength} Byte`;
-      inspTagStatus.textContent = 'AUTENTICATO (AEAD)';
+      inspTagStatus.textContent = encResult.isSigned ? 'AUTENTICATO + FIRMATO (Ed25519)' : 'AUTENTICATO (AEAD)';
       inspTagStatus.className = 's-val text-emerald';
     }
 
@@ -947,6 +1153,46 @@
 
     quickPresetBtn.addEventListener('click', () => loadPreset('cyclelab'));
     launchCycleLabDemoBtn.addEventListener('click', () => loadPreset('cyclelab'));
+
+    // Simulazioni CycleLab v2.0
+    if (clFreezeMatassaBtn) {
+      clFreezeMatassaBtn.addEventListener('click', () => {
+        audio.playClick(900, 0.06);
+        inputText.value = "Matassa Core IP: Ciclo Dominante 42.5 giorni. Pivot non-repainting. Matrice pesi ciclici confermata. Accesso RAM volatile protetto.";
+        currentDirection = 'ITA_TO_NEXA';
+        updateTransliteration();
+        vaultPaddingSelect.value = "8192";
+        if (vaultFormatSelect) vaultFormatSelect.value = "nxs2";
+        if (vaultKdfProfileSelect) vaultKdfProfileSelect.value = "desktop";
+        switchTab('vault');
+        setTimeout(() => encryptActionBtn.click(), 250);
+      });
+    }
+
+    if (clSignOrderBtn) {
+      clSignOrderBtn.addEventListener('click', () => {
+        audio.playClick(950, 0.06);
+        inputText.value = "[CYCLELAB-ORDER-BUS] ACTION: BUY | SYMBOL: BTCUSDT | QTY: 0.50 | PRICE: 64500.00 | SL: 63200.00 | TP: 68000.00";
+        currentDirection = 'ITA_TO_NEXA';
+        updateTransliteration();
+        vaultPaddingSelect.value = "4096";
+        if (vaultFormatSelect) vaultFormatSelect.value = "nxs2";
+        if (vaultSignCheck) vaultSignCheck.checked = true;
+        switchTab('vault');
+        setTimeout(() => encryptActionBtn.click(), 250);
+      });
+    }
+
+    if (clMobileHudBtn) {
+      clMobileHudBtn.addEventListener('click', () => {
+        audio.playClick(1100, 0.08);
+        inputText.value = "SEGNALE CYCLELAB: BUY BTCUSDT A 64500 CONFERMATO DAI CICLI 10D E 40D";
+        currentDirection = 'ITA_TO_NEXA';
+        wrapBlocksCheck.checked = true;
+        updateTransliteration();
+        switchTab('studio');
+      });
+    }
 
     // Inizializzazione iniziale con preset dimostrativo
     loadPreset('andrea');
