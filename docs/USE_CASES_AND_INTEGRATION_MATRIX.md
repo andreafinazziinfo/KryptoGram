@@ -109,20 +109,26 @@ Questa è la domanda cardine sollevata dall'analisi operativa. La risposta scien
   - **Difesa da Shoulder Surfing / Telecamere fisiche**: Il passante dietro di te o la telecamera a circuito chiuso non hanno il parser in tempo reale negli occhi. Continueranno a vedere geroglifici incomprensibili.
   - **Difesa da Web Scraper Generici / Crawler AI**: I bot generici cercano parole inglesi o formati noti (regex di carte di credito, indirizzi crypto, parole chiave). I glifi non vengono indicizzati.
 
-### 3. La Soluzione Architetturale per la Massima Sicurezza
+### 3. La Soluzione Architetturale: Permutazione Dinamica Keyed (IMPLEMENTATA ✓)
 
-Per unire il meglio dei due mondi:
-1. **Repository Strettamente PRIVATO (Stato Attuale)**:
-   - Mantenere l'intero repository su `andreafinazziinfo` come **privato** preserva sia la segretezza delle tabelle fonetiche, sia le integrazioni esclusive con la Matassa e CycleLab.
-2. **Evoluzione Futura: Permutazione Dinamica dell'Alfabeto (Keyed Alphabet Permutation)**:
-   - Se in futuro vorrai rendere il codice open source, possiamo implementare una funzione dove l'associazione tra lettere e glifi **non è hardcoded**, ma viene rimescolata matematicamente usando un seed derivato dalla passphrase personale (`derive_custom_alphabet(passphrase)`).
-   - In quel modo, anche con il codice open source al 100%, senza la passphrase nessuno al mondo potrà conoscere quale glifo corrisponde a quale lettera.
+Per rendere il progetto pubblicabile in modo 100% sicuro e conforme al Principio di Kerckhoffs:
+1. **Motore Dinamico a 26! Combinazioni (`derive_dynamic_alphabet`)**:
+   - Abbiamo implementato in [nexa_lib.py](file:///c:/Users/Andrea/Desktop/Alfabeto%20Cryptato/nexa_lib.py) e testato con successo in [test_phonetics.py](file:///c:/Users/Andrea/Desktop/Alfabeto%20Cryptato/tests/test_phonetics.py) la derivazione con seed crittografico via HMAC-SHA256 e shuffle di Fisher-Yates.
+   - Spazio combinatorio: $26! \approx 4.03 \times 10^{26}$ permutazioni (~88 bit di entropia fonetica pura).
+   - **Risultato**: Anche se il codice sorgente è 100% pubblico su GitHub, **nessuno al mondo può risalire alla mappatura fonetica senza conoscere la tua chiave segreta**.
+2. **Architettura Ibrida a Doppio Profilo**:
+   - **Profilo Canonico (Default)**: Mappatura standard per test aperti, CI, documentazione pubblica e demo.
+   - **Profilo Enclave Keyed (Sicurezza Assoluta)**: Permutazione dinamica attivata fornendo la propria passphrase o salt privato.
+3. **Difesa da Violazione Account Web (Zero-Knowledge Enclave)**:
+   - Se un attaccante sottrae la password del sito web, non può accedere ai contenuti cifrati: la Master Key NXS2 e le chiavi di firma Ed25519 risiedono esclusivamente nel client locale/enclave hardware, mai nel database del server.
 
 ---
 
 ## 🎯 Verdetto Operativo & Raccomandazione
 
-1. **Brand Indipendente**: Chiamare il progetto **`KRYPTEX`** (oppure **`KRYPTEX-ENCLAVE`**).
-2. **Ruolo CycleLab**: CycleLab include `cyclelab_bridge.py` come modulo `CycleLab.Security` o `CycleLab.Enclave`.
-3. **Accesso Repo**: Mantenere la repo remota **privata** su GitHub.
+1. **Brand Indipendente**: Progetto denominato **`KRYPTEX`** (oppure **`KRYPTEX-ENCLAVE`**).
+2. **Ruolo CycleLab**: CycleLab integra il bridge crittografico come modulo strategico `CycleLab.Security`.
+3. **Strategia Repository**: 
+   - **Opzione Consigliata**: Rilascio **Pubblico** sfruttando la **Permutazione Dinamica Keyed** (massima trasparenza crittografica per la community, massima riservatezza matematica per i tuoi dati personali).
+   - **Alternativa**: Mantenere la repo **Privata** per riservatezza totale di ogni dettaglio implementativo.
 4. **Allineamento Piano 9P**: Il piano antiscraping di CycleLab è perfettamente allineato e viene promosso da HMAC simmetrico a busta asimmetrica NXS2 Post-Quantum.
