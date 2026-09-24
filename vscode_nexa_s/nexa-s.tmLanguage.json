@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "NEXA-S",
+  "scopeName": "source.nexa-s",
+  "patterns": [
+    {"match": "⟦[^⟧]+⟧", "name": "entity.name.type.nexa"},
+    {"match": "⟪[^⟫]+⟫", "name": "constant.numeric.nexa"},
+    {"match": "[∧⊢⌟⊣∨]", "name": "variable.language.nexa-vowel"},
+    {"match": "[⊓≈∿⌇⋉][←↓↑→⊙·:]*", "name": "keyword.operator.nexa-consonant"}
+  ]
+}

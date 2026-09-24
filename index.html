@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXA-S // Cryptographic Terminal & Phonetic Studio</title>
+  <meta name="description" content="Terminale interattivo per NEXA-S: alfabeto fonetico simbolico, cifratura autenticata AEAD e integrazione quantitativa per CycleLab.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="cyber-theme">
+  <!-- Sfondo dinamico a griglia cosmica -->
+  <div class="cyber-grid-overlay" aria-hidden="true"></div>
+  <div class="ambient-glow cyan-glow" aria-hidden="true"></div>
+  <div class="ambient-glow emerald-glow" aria-hidden="true"></div>
+
+  <!-- Header Principale -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-group">
+        <div class="brand-icon">
+          <span class="glyph-symbol">⟦∧⟧</span>
+        </div>
+        <div>
+          <div class="brand-title">
+            <h1>NEXA-S <span class="version-tag">v1.3.0</span></h1>
+            <span class="status-indicator online"><span class="status-dot"></span> OPERATIVO</span>
+          </div>
+          <p class="brand-subtitle">Symbolic Phonetic Alphabet &bull; Authenticated Envelope AEAD &bull; CycleLab Security Bridge</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="soundToggleBtn" class="action-btn header-toggle" title="Attiva/Disattiva Suoni Cyber Audio">
+          <span class="btn-icon">🔊</span>
+          <span class="btn-text">Audio FX: <span id="soundStatusText">ON</span></span>
+        </button>
+        <button id="quickPresetBtn" class="action-btn primary-glow-btn" title="Carica Preset Rapido CycleLab">
+          <span class="btn-icon">⚡</span>
+          <span>CycleLab Formula</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" aria-label="Sezioni Principali">
+      <div class="tabs-container">
+        <button class="nav-tab active" data-tab="studio">
+          <span class="tab-icon">🔤</span> Studio Traslitterazione
+        </button>
+        <button class="nav-tab" data-tab="keyboard">
+          <span class="tab-icon">⌨️</span> Matrice Glifi
+        </button>
+        <button class="nav-tab" data-tab="vault">
+          <span class="tab-icon">🔐</span> Vault Cifratura AEAD
+        </button>
+        <button class="nav-tab" data-tab="inspector">
+          <span class="tab-icon">🔬</span> Hex Inspector
+        </button>
+        <button class="nav-tab" data-tab="showcase">
+          <span class="tab-icon">📜</span> Showcase & Preset
+        </button>
+        <button class="nav-tab" data-tab="audit">
+          <span class="tab-icon">🏛️</span> Audit Framework
+        </button>
+        <button class="nav-tab" data-tab="cyclelab">
+          <span class="tab-icon">📈</span> CycleLab Bridge
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Contenuto Principale -->
+  <main class="main-content">
+
+    <!-- SEZIONE 1: Studio Traslitterazione -->
+    <section id="section-studio" class="tab-pane active">
+      <div class="panel-layout-dual">
+        <!-- Pannello Input Testo Naturale -->
+        <div class="glass-card editor-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="badge badge-cyan">INPUT</span>
+              <h2>Linguaggio Naturale (Italiano / Testo)</h2>
+            </div>
+            <div class="panel-controls">
+              <span class="char-count" id="inputTextCount">0 caratteri</span>
+              <button class="icon-btn" id="clearInputBtn" title="Cancella testo">✕</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <textarea id="inputText" class="cyber-textarea" placeholder="Digita o incolla testo in italiano (es: 'Andrea conferma l’appuntamento per domani alle 18:30')..." spellcheck="false"></textarea>
+          </div>
+          <div class="panel-footer">
+            <div class="quick-chips">
+              <span class="chip-label">Esempi rapidi:</span>
+              <button class="chip" data-sample="andrea">Appuntamento Andrea</button>
+              <button class="chip" data-sample="cyclelab">Formula CycleLab</button>
+              <button class="chip" data-sample="security">Regola Passphrase</button>
+            </div>
+            <div class="footer-actions">
+              <button class="btn btn-secondary" id="copyInputBtn">Copia Testo</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Colonna Centrale Operazioni -->
+        <div class="middle-controls">
+          <button class="swap-direction-btn" id="swapDirectionBtn" title="Inverti direzione di conversione">
+            <span class="swap-arrow">⇄</span>
+            <span class="swap-label" id="swapLabel">ITA → NEXA</span>
+          </button>
+          <div class="option-toggle">
+            <label class="toggle-switch">
+              <input type="checkbox" id="wrapBlocksCheck" checked>
+              <span class="slider"></span>
+            </label>
+            <span class="toggle-label" title="Racchiude frasi ed entità nei delimitatori ⟦...⟧">Delimitatori ⟦ ⟧</span>
+          </div>
+          <button class="btn btn-primary pulse-btn" id="transliterateBtn">
+            <span>Traslittera Ora</span>
+          </button>
+        </div>
+
+        <!-- Pannello Output Glifi NEXA-S -->
+        <div class="glass-card editor-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="badge badge-emerald">OUTPUT</span>
+              <h2>Glifi Fonetici NEXA-S</h2>
+            </div>
+            <div class="panel-controls">
+              <span class="char-count" id="outputGlyphCount">0 glifi</span>
+              <button class="icon-btn" id="copyGlyphsBtn" title="Copia Glifi">📋</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <textarea id="outputGlyphs" class="cyber-textarea glyphs-font" placeholder="I glifi simbolici NEXA-S compariranno qui in tempo reale..." readonly></textarea>
+          </div>
+          <div class="panel-footer">
+            <div class="glyph-metrics">
+              <span class="metric-item">Fonetica: <strong class="text-cyan">v2.0</strong></span>
+              <span class="metric-item">Sintassi: <strong class="text-emerald" id="syntaxStatus">VALIDA</strong></span>
+              <span class="metric-item">Entropia: <strong class="text-amber" id="entropyMetric">0.00 bit</strong></span>
+            </div>
+            <div class="footer-actions">
+              <button class="btn btn-secondary" id="sendToVaultBtn">Invia al Vault 🔐</button>
+              <button class="btn btn-primary" id="downloadGlyphsBtn">Scarica .nexa</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ispezione Fonetica Parola per Parola -->
+      <div class="glass-card breakdown-card">
+        <div class="card-header-compact">
+          <h3>Mappatura Fonema-per-Fonema (Live Inspection)</h3>
+          <span class="text-muted">Mostra come ogni parola viene segmentata ed espressa in simboli</span>
+        </div>
+        <div class="breakdown-container" id="phoneticBreakdown">
+          <div class="empty-hint">Digita del testo sopra per visualizzare l'albero di scomposizione fonetica.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEZIONE 2: Matrice dei Glifi (Tastiera Virtuale Tattile) -->
+    <section id="section-keyboard" class="tab-pane">
+      <div class="glass-card keyboard-card">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="badge badge-purple">MATRICE TATTICA</span>
+            <h2>Tastiera Virtuale Glifi NEXA-S</h2>
+          </div>
+          <div class="panel-controls">
+            <span class="text-muted">Clicca sui tasti per inserire glifi nell'editor attivo o ascoltare la frequenza fonetica</span>
+          </div>
+        </div>
+
+        <div class="keyboard-grid-layout">
+          <!-- Vocali Primarie -->
+          <div class="key-group">
+            <h4 class="group-title">Vocali Cardinali (`VOWELS`)</h4>
+            <div class="keys-row">
+              <button class="glyph-key" data-glyph="⊕" data-desc="A standard (aperta)">
+                <span class="gk-symbol">⊕</span>
+                <span class="gk-label">a</span>
+              </button>
+              <button class="glyph-key" data-glyph="∧" data-desc="A iniziale / maiuscola">
+                <span class="gk-symbol">∧</span>
+                <span class="gk-label">A*</span>
+              </button>
+              <button class="glyph-key" data-glyph="≋" data-desc="E anteriore semichiusa">
+                <span class="gk-symbol">≋</span>
+                <span class="gk-label">e</span>
+              </button>
+              <button class="glyph-key" data-glyph="∿" data-desc="I anteriore chiusa">
+                <span class="gk-symbol">∿</span>
+                <span class="gk-label">i</span>
+              </button>
+              <button class="glyph-key" data-glyph="⊙" data-desc="O posteriore semichiusa">
+                <span class="gk-symbol">⊙</span>
+                <span class="gk-label">o</span>
+              </button>
+              <button class="glyph-key" data-glyph="∪" data-desc="U posteriore chiusa">
+                <span class="gk-symbol">∪</span>
+                <span class="gk-label">u</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Consonanti Ostruenti e Liquide -->
+          <div class="key-group">
+            <h4 class="group-title">Consonanti & Fricative (`CONSONANTS`)</h4>
+            <div class="keys-row">
+              <button class="glyph-key" data-glyph="⊓" data-desc="B occlusiva bilabiale"><span class="gk-symbol">⊓</span><span class="gk-label">b</span></button>
+              <button class="glyph-key" data-glyph="⌁" data-desc="C/K occlusiva velare / affricata"><span class="gk-symbol">⌁</span><span class="gk-label">c / k</span></button>
+              <button class="glyph-key" data-glyph="∆" data-desc="D occlusiva alveolare sonora"><span class="gk-symbol">∆</span><span class="gk-label">d</span></button>
+              <button class="glyph-key" data-glyph="ƒ" data-desc="F fricativa labiodentale sorda"><span class="gk-symbol">ƒ</span><span class="gk-label">f</span></button>
+              <button class="glyph-key" data-glyph="⅁" data-desc="G occlusiva velare sonora"><span class="gk-symbol">⅁</span><span class="gk-label">g</span></button>
+              <button class="glyph-key" data-glyph="⊥" data-desc="T occlusiva alveolare sorda"><span class="gk-symbol">⊥</span><span class="gk-label">t</span></button>
+              <button class="glyph-key" data-glyph="⌯" data-desc="L laterale alveolare"><span class="gk-symbol">⌯</span><span class="gk-label">l</span></button>
+              <button class="glyph-key" data-glyph="⋔" data-desc="M nasale bilabiale"><span class="gk-symbol">⋔</span><span class="gk-label">m</span></button>
+              <button class="glyph-key" data-glyph="⋒" data-desc="N nasale alveolare"><span class="gk-symbol">⋒</span><span class="gk-label">n</span></button>
+              <button class="glyph-key" data-glyph="⌐" data-desc="P occlusiva bilabiale sorda"><span class="gk-symbol">⌐</span><span class="gk-label">p</span></button>
+              <button class="glyph-key" data-glyph="⌿" data-desc="R vibrante alveolare"><span class="gk-symbol">⌿</span><span class="gk-label">r / v</span></button>
+              <button class="glyph-key" data-glyph="≈" data-desc="S fricativa alveolare sorda"><span class="gk-symbol">≈</span><span class="gk-label">s</span></button>
+              <button class="glyph-key" data-glyph="↑" data-desc="Z affricata alveolare"><span class="gk-symbol">↑</span><span class="gk-label">z</span></button>
+              <button class="glyph-key" data-glyph="⌇" data-desc="J approssimante palatale"><span class="gk-symbol">⌇</span><span class="gk-label">j</span></button>
+            </div>
+          </div>
+
+          <!-- Delimitatori & Logica Strutturale -->
+          <div class="key-group">
+            <h4 class="group-title">Delimitatori di Busta & Numeri (`SYNTAX & LOGIC`)</h4>
+            <div class="keys-row">
+              <button class="glyph-key special-key" data-glyph="⟦" data-desc="Apertura Busta / Frase"><span class="gk-symbol">⟦</span><span class="gk-label">Block In</span></button>
+              <button class="glyph-key special-key" data-glyph="⟧" data-desc="Chiusura Busta / Frase"><span class="gk-symbol">⟧</span><span class="gk-label">Block Out</span></button>
+              <button class="glyph-key special-key" data-glyph="⟪" data-desc="Apertura Numero"><span class="gk-symbol">⟪</span><span class="gk-label">Num In</span></button>
+              <button class="glyph-key special-key" data-glyph="⟫" data-desc="Chiusura Numero"><span class="gk-symbol">⟫</span><span class="gk-label">Num Out</span></button>
+              <button class="glyph-key special-key" data-glyph="∴" data-desc="Punto Fermo / Full Stop"><span class="gk-symbol">∴</span><span class="gk-label">Punto .</span></button>
+              <button class="glyph-key special-key" data-glyph="⇒" data-desc="Implicazione / Allora"><span class="gk-symbol">⇒</span><span class="gk-label">allora</span></button>
+              <button class="glyph-key special-key" data-glyph="≥" data-desc="Maggiore o Uguale"><span class="gk-symbol">≥</span><span class="gk-label">&gt;=</span></button>
+              <button class="glyph-key special-key" data-glyph="≤" data-desc="Minore o Uguale"><span class="gk-symbol">≤</span><span class="gk-label">&lt;=</span></button>
+              <button class="glyph-key special-key" data-glyph="%" data-desc="Percentuale"><span class="gk-symbol">%</span><span class="gk-label">%</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="keyboard-preview-bar">
+          <div class="preview-display">
+            <span class="preview-label">Buffer Digitazione:</span>
+            <span id="keyboardBuffer" class="preview-text glyphs-font">⟦ ⟧</span>
+          </div>
+          <div class="preview-actions">
+            <button class="btn btn-secondary" id="clearBufferBtn">Cancella Buffer</button>
+            <button class="btn btn-primary" id="insertBufferToEditorBtn">Inserisci nello Studio</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEZIONE 3: Vault Crittografico AEAD -->
+    <section id="section-vault" class="tab-pane">
+      <div class="vault-grid">
+        <!-- Pannello Controlli Cifratura -->
+        <div class="glass-card vault-control-card">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="badge badge-cyan">AEAD ENGINE</span>
+              <h2>Busta Crittografica NEXA-S</h2>
+            </div>
+            <span class="crypto-chip">PBKDF2-HMAC-SHA256 &bull; AES-256-GCM / ChaCha20</span>
+          </div>
+
+          <div class="vault-form">
+            <div class="form-group">
+              <label for="vaultPassphrase">Passphrase di Cifratura</label>
+              <div class="password-input-wrap">
+                <input type="password" id="vaultPassphrase" class="cyber-input" placeholder="Inserisci passphrase sicura (min 8 caratteri)..." autocomplete="new-password">
+                <button type="button" class="eye-btn" id="togglePassEye" title="Mostra/Nascondi Passphrase">👁️</button>
+              </div>
+              <div class="pass-strength-meter">
+                <div class="strength-bar" id="passStrengthBar"></div>
+              </div>
+              <span class="strength-hint" id="passStrengthHint">Forza: Richiesta passphrase</span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-6">
+                <label for="vaultPaddingSelect">Padding Offuscamento (Traffic Analysis Defense)</label>
+                <select id="vaultPaddingSelect" class="cyber-select">
+                  <option value="4096" selected>4096 Byte (Standard NEXA-S)</option>
+                  <option value="8192">8192 Byte (High Security)</option>
+                  <option value="1024">1024 Byte (Compact)</option>
+                  <option value="0">0 Byte (Nessun padding)</option>
+                </select>
+              </div>
+              <div class="form-group col-6">
+                <label for="vaultEncodingSelect">Formato Output / Esportazione</label>
+                <select id="vaultEncodingSelect" class="cyber-select">
+                  <option value="base64url" selected>Base64url (Safe for Chat & Cloud)</option>
+                  <option value="hex">Hex String (Byte-by-Byte)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="vault-action-buttons">
+              <button class="btn btn-primary btn-large glow-btn-cyan" id="encryptActionBtn">
+                <span class="btn-icon">🔒</span>
+                <span>Cifra e Genera Busta .nexa</span>
+              </button>
+              <button class="btn btn-secondary btn-large" id="decryptActionBtn">
+                <span class="btn-icon">🔓</span>
+                <span>Decifra Busta .nexa</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="vault-security-summary">
+            <div class="sec-item">
+              <span class="sec-label">Nonce:</span>
+              <span class="sec-val text-cyan">96-bit CSPRNG per sessione</span>
+            </div>
+            <div class="sec-item">
+              <span class="sec-label">Salt:</span>
+              <span class="sec-val text-emerald">128-bit crittograficamente casuale</span>
+            </div>
+            <div class="sec-item">
+              <span class="sec-label">Integrity Tag:</span>
+              <span class="sec-val text-purple">128-bit GMAC / Poly1305</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Risultato Envelope Cifrato / Decifrato -->
+        <div class="glass-card vault-result-card">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="badge badge-emerald">ENVELOPE DATA</span>
+              <h2>Payload della Busta (.nexa)</h2>
+            </div>
+            <div class="panel-controls">
+              <span class="char-count" id="envelopeByteCount">0 byte</span>
+              <button class="icon-btn" id="copyEnvelopeBtn" title="Copia Envelope">📋</button>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <textarea id="vaultEnvelopeOutput" class="cyber-textarea mono-font" placeholder="Il pacchetto crittografico cifrato Base64url o il testo decifrato appariranno qui..." spellcheck="false"></textarea>
+          </div>
+
+          <div class="panel-footer">
+            <div class="envelope-status" id="vaultStatusMessage">
+              In attesa di operazione di cifratura o decifratura...
+            </div>
+            <div class="footer-actions">
+              <button class="btn btn-secondary" id="tamperTestBtn" title="Inverte un bit nel ciphertext per testare l'immediato rifiuto del tag di autenticazione">
+                💥 Test Manomissione
+              </button>
+              <button class="btn btn-primary" id="inspectEnvelopeBtn">
+                🔬 Ispeziona Byte
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEZIONE 4: Hex Inspector & Byte Layout -->
+    <section id="section-inspector" class="tab-pane">
+      <div class="glass-card inspector-card">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="badge badge-cyan">BYTE-LEVEL ARCHITECTURE</span>
+            <h2>Dissezione Strutturale della Busta NEXA-S</h2>
+          </div>
+          <span class="text-muted">Tracciabilità immutabile del flusso binario (Data Lineage & Provenance)</span>
+        </div>
+
+        <!-- Mappa dei Colori dell'Header -->
+        <div class="byte-legend">
+          <span class="legend-chip legend-magic"><span class="legend-color"></span> Magic Header (5B: NEXA1)</span>
+          <span class="legend-chip legend-salt"><span class="legend-color"></span> Salt KDF (16B)</span>
+          <span class="legend-chip legend-nonce"><span class="legend-color"></span> Nonce IV (12B)</span>
+          <span class="legend-chip legend-len"><span class="legend-color"></span> Payload Length (4B)</span>
+          <span class="legend-chip legend-data"><span class="legend-color"></span> Ciphertext + Padding</span>
+          <span class="legend-chip legend-tag"><span class="legend-color"></span> Auth Tag MAC (16B)</span>
+        </div>
+
+        <div class="hex-viewer-container">
+          <div class="hex-dump mono-font" id="hexDumpViewer">
+            00000000  4e 45 58 41 31 7a 8f 12  3b 90 e1 4a 8c 99 21 bb  |NEXA1z..;..J..!.|
+00000010  0a 1f 44 cc 11 22 33 44  55 66 77 88 99 aa bb cc  |..D.."3DUfww....|
+00000020  00 00 00 2a 68 65 6c 6c  6f 20 6e 65 78 61 20 73  |...*hello nexa s|
+... (Cifra un messaggio nel Vault per visualizzare il dump esadecimale reale)
+          </div>
+        </div>
+
+        <div class="inspector-summary-grid">
+          <div class="summary-box">
+            <span class="s-label">Dimensione Totale:</span>
+            <span class="s-val" id="inspTotalSize">0 Byte</span>
+          </div>
+          <div class="summary-box">
+            <span class="s-label">Dati Utili (Plaintext):</span>
+            <span class="s-val text-cyan" id="inspPayloadSize">0 Byte</span>
+          </div>
+          <div class="summary-box">
+            <span class="s-label">Overhead Padding:</span>
+            <span class="s-val text-amber" id="inspPaddingSize">0 Byte</span>
+          </div>
+          <div class="summary-box">
+            <span class="s-label">Integrità Crittografica:</span>
+            <span class="s-val text-emerald" id="inspTagStatus">VERIFICATA</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEZIONE 5: Showcase & Preset -->
+    <section id="section-showcase" class="tab-pane">
+      <div class="showcase-header">
+        <h2>Libreria Ufficiale Testi & Casi d'Uso Killer</h2>
+        <p class="text-muted">Seleziona uno showcase per caricarlo istantaneamente nello studio fonetico e nel vault crittografico</p>
+      </div>
+
+      <div class="showcase-grid">
+        <!-- Preset 1: Messaggio Personale Andrea -->
+        <div class="glass-card showcase-item">
+          <div class="showcase-badge badge-cyan">CASE 01 &bull; MESSAGGIO PRIVATO</div>
+          <h3>Messaggio Personale (Andrea)</h3>
+          <p class="showcase-desc">Comunicazione operativa con appuntamento orario, nomi propri e istruzioni per documenti riservati.</p>
+          <div class="showcase-snippet mono-font">
+            "Andrea conferma l’appuntamento per domani alle 18:30. Portare i documenti cifrati."
+          </div>
+          <button class="btn btn-secondary showcase-load-btn" data-load="andrea">
+            Carica nello Studio ⚡
+          </button>
+        </div>
+
+        <!-- Preset 2: Formula Finanziaria CycleLab -->
+        <div class="glass-card showcase-item featured-item">
+          <div class="showcase-badge badge-emerald">CASE 02 &bull; CYCLELAB QUANT RULE</div>
+          <h3>Formula Quantitativa CycleLab</h3>
+          <p class="showcase-desc">Regola quantitativa condizionale per ribilanciamento automatico di portafoglio su rendimento annuale.</p>
+          <div class="showcase-snippet mono-font">
+            "Se il rendimento annuale è ≥ 8%, allora aumenta la posizione del 10%."
+          </div>
+          <button class="btn btn-primary showcase-load-btn" data-load="cyclelab">
+            Carica nello Studio ⚡
+          </button>
+        </div>
+
+        <!-- Preset 3: Sicurezza Passphrase -->
+        <div class="glass-card showcase-item">
+          <div class="showcase-badge badge-purple">CASE 03 &bull; SECURITY HYGIENE</div>
+          <h3>Rotazione Passphrase & Chiavi Offline</h3>
+          <p class="showcase-desc">Procedura di igiene di sicurezza per la rotazione trimestrale delle credenziali e conservazione offline.</p>
+          <div class="showcase-snippet mono-font">
+            "Ricordati di ruotare le passphrase ogni 3 mesi e di conservare le chiavi offline."
+          </div>
+          <button class="btn btn-secondary showcase-load-btn" data-load="security">
+            Carica nello Studio ⚡
+          </button>
+        </div>
+
+        <!-- Preset 4: Matassa Frozen Custom IP -->
+        <div class="glass-card showcase-item">
+          <div class="showcase-badge badge-amber">CASE 04 &bull; CONFINE IP CYCLELAB</div>
+          <h3>Costanti Cicliche Matassa Frozen</h3>
+          <p class="showcase-desc">Payload di pesi armonici proprietari per pivot non-repainting esportati in busta sicura.</p>
+          <div class="showcase-snippet mono-font">
+            "Matassa Core: Ciclo Dominante 42.5 giorni. Pivot non-repainting confermato. Confine IP Frozen."
+          </div>
+          <button class="btn btn-secondary showcase-load-btn" data-load="matassa">
+            Carica nello Studio ⚡
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEZIONE 6: Audit Framework Operativo -->
+    <section id="section-audit" class="tab-pane">
+      <div class="glass-card audit-dashboard">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="badge badge-purple">ENGINEERING GOVERNANCE</span>
+            <h2>Audit Ingegneristico: Framework Operativo</h2>
+          </div>
+          <div class="maturity-score-box">
+            <span class="ms-label">Maturity Score:</span>
+            <span class="ms-val text-emerald">LIVELLO 2 (Baseline &rarr; 3 Incremental)</span>
+          </div>
+        </div>
+
+        <p class="audit-intro">
+          Valutazione condotta applicando i <strong>9 Pilastri di <code>1_DESIGN</code></strong> e la <strong>Scorecard di <code>FRAMEWORK_MATURITY.md</code></strong> dal manuale operativo di Andrea.
+        </p>
+
+        <!-- 9 Pilastri Grid -->
+        <div class="pillars-grid">
+          <div class="pillar-card pass">
+            <div class="pillar-num">01</div>
+            <div class="pillar-content">
+              <h4>Pre-Mortem Analysis</h4>
+              <p>Identificati 5 scenari di guasto: dipendenza binaria age, ambiguità fonetica inversa, secret in memory, corruzione Base64url, shoulder surfing.</p>
+              <span class="p-status tag-pass">MITIGATO</span>
+            </div>
+          </div>
+
+          <div class="pillar-card pass">
+            <div class="pillar-num">02</div>
+            <div class="pillar-content">
+              <h4>ADR (Decision Records)</h4>
+              <p>Scelta motivata di XChaCha20-Poly1305 (nonce a 192 bit anticollisione) + Argon2id vs AES-GCM tradizionale. Alfabeto simbolico vs semplice cifrario a sostituzione.</p>
+              <span class="p-status tag-pass">CONFORME</span>
+            </div>
+          </div>
+
+          <div class="pillar-card pass">
+            <div class="pillar-num">03</div>
+            <div class="pillar-content">
+              <h4>Blast Radius Isolation</h4>
+              <p>Totale disaccoppiamento tra parser fonetico (nexa_lib) e layer crittografico (nexa_encrypt). Eventuali errori testuali non alterano il tag AEAD.</p>
+              <span class="p-status tag-pass">ISOLATO</span>
+            </div>
+          </div>
+
+          <div class="pillar-card pass">
+            <div class="pillar-num">04</div>
+            <div class="pillar-content">
+              <h4>Data Lineage & Provenance</h4>
+              <p>Magic Header esplicito `NEXA1` (5B), Salt (16B), Nonce (12B), Payload Length (4B), Ciphertext, Tag MAC (16B). Tracciabilità esatta dei byte.</p>
+              <span class="p-status tag-pass">DOCUMENTATO</span>
+            </div>
+          </div>
+
+          <div class="pillar-card pass">
+            <div class="pillar-num">05</div>
+            <div class="pillar-content">
+              <h4>Idempotency & Zero-Side-Effect</h4>
+              <p>La decifratura è pura: stesso ciphertext + passphrase corretta genera sempre lo stesso output senza alterare lo stato del sistema.</p>
+              <span class="p-status tag-pass">IDEMPOTENTE</span>
+            </div>
+          </div>
+
+          <div class="pillar-card pass">
+            <div class="pillar-num">06</div>
+            <div class="pillar-content">
+              <h4>Chaos & Resilience Test</h4>
+              <p>Test di bit-flipping e iniezione di rumore: qualsiasi manomissione di un singolo bit nel ciphertext causa il rifiuto immediato del tag Poly1305.</p>
+              <span class="p-status tag-pass">RESILIENTE</span>
+            </div>
+          </div>
+
+          <div class="pillar-card pass">
+            <div class="pillar-num">07</div>
+            <div class="pillar-content">
+              <h4>Circuit Breakers & Observability</h4>
+              <p>Protezione contro attacchi di decompressione/padding sproporzionato; telemetria locale su errori di parsing senza leak di dati nel log.</p>
+              <span class="p-status tag-pass">ATTIVO</span>
+            </div>
+          </div>
+
+          <div class="pillar-card pass">
+            <div class="pillar-num">08</div>
+            <div class="pillar-content">
+              <h4>Security & Secrets</h4>
+              <p>Threat model esplicito: nessuna memorizzazione di chiavi su disco in chiaro, KDF ad alto costo computazionale, padding anti-traffic analysis.</p>
+              <span class="p-status tag-pass">SICURO</span>
+            </div>
+          </div>
+
+          <div class="pillar-card pass">
+            <div class="pillar-num">09</div>
+            <div class="pillar-content">
+              <h4>Cost & Capacity Model</h4>
+              <p>Overhead del padding controllabile (4096B di default); footprint computazionale client-side a zero costo di infrastruttura cloud.</p>
+              <span class="p-status tag-pass">OTTIMIZZATO</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEZIONE 7: CycleLab Integration Bridge -->
+    <section id="section-cyclelab" class="tab-pane">
+      <div class="glass-card cyclelab-card">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="badge badge-emerald">QUANTITATIVE PLATFORM SYNERGY</span>
+            <h2>Integrazione Strategica con CycleLab Terminal</h2>
+          </div>
+          <span class="text-muted">Come NEXA-S potenzia la sicurezza della piattaforma di trading quantitativo</span>
+        </div>
+
+        <div class="cyclelab-pillars-grid">
+          <div class="cl-box">
+            <div class="cl-icon">🛡️</div>
+            <h3>1. Confine IP ("Matassa Frozen")</h3>
+            <p>CycleLab protegge il core proprietario <code>progetto-matassa</code> (analisi ciclica e pivot non-repainting). Con NEXA-S, i pesi di Fourier e le costanti di calcolo possono essere cifrati in buste protette da Argon2id prima della sincronizzazione mobile.</p>
+            <span class="cl-tag text-emerald">IP Protection</span>
+          </div>
+
+          <div class="cl-box">
+            <div class="cl-icon">📓</div>
+            <h3>2. Diario di Trading Cifrato (Zero-Knowledge)</h3>
+            <p>Permette ai trader di annotare riflessioni psicologiche, anomalie operative e segnali discrezionali. I log vengono archiviati su Redis/Postgres in forma crittografata con passphrase personale, garantendo privacy assoluta.</p>
+            <span class="cl-tag text-cyan">Trader Privacy</span>
+          </div>
+
+          <div class="cl-box">
+            <div class="cl-icon">👁️</div>
+            <h3>3. Offuscamento Visivo Anti-Shoulder Surfing</h3>
+            <p>Sull'app mobile Android di CycleLab (Capacitor), attivare la modalità "NEXA-S HUD" trasforma i segnali ciclici e gli alert in glifi simbolici: incomprensibili per chi osserva lo schermo in pubblico, ma leggibili per il trader.</p>
+            <span class="cl-tag text-purple">Mobile Tactical HUD</span>
+          </div>
+
+          <div class="cl-box">
+            <div class="cl-icon">🔑</div>
+            <h3>4. Vault API Keys Exchange & Broker</h3>
+            <p>Le chiavi API dei broker (Binance, Bybit, Interactive Brokers) per order flow ed esecuzione ordini vengono custodite in un keystore locale autenticato AEAD anziché in file <code>.env</code> in chiaro.</p>
+            <span class="cl-tag text-amber">Credential Hardening</span>
+          </div>
+        </div>
+
+        <div class="cyclelab-action-banner">
+          <div class="banner-text">
+            <h4>Vuoi esportare una regola quantitativa CycleLab in formato NEXA-S?</h4>
+            <p>Genera una busta autenticata con padding di sicurezza da distribuire ai nodi del terminale.</p>
+          </div>
+          <button class="btn btn-primary" id="launchCycleLabDemoBtn">Carica Demo CycleLab</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer con Info di Stato -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <span>NEXA-S // Sovereign Cryptographic Framework</span>
+      </div>
+      <div class="footer-col text-center">
+        <span>Fonetica Simbolica + XChaCha20-Poly1305 + Argon2id</span>
+      </div>
+      <div class="footer-col text-right">
+        <span>Conforme a <strong>1_DESIGN</strong> &bull; Framework Operativo</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

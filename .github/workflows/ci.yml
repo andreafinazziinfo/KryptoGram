@@ -1,0 +1,106 @@
+name: NEXA-S v2.0 CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-format:
+    name: Code Quality (Ruff & Formatting)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Linting Tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff black
+
+      - name: Run Ruff Linter
+        run: ruff check .
+
+      - name: Check Code Formatting (Black)
+        run: black --check .
+
+  type-check:
+    name: Static Type Analysis (Mypy)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install mypy pytest
+
+      - name: Run Mypy Type Checker
+        run: mypy --config-file mypy.ini nexa_lib.py nexa_crypto_v2.py nexa_cli_v2.py
+
+  security-scan:
+    name: Cryptographic & Secret Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Security Scanners
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit
+
+      - name: Run Bandit Security Audit
+        run: bandit -r nexa_lib.py nexa_crypto_v2.py nexa_cli_v2.py -ll
+
+  test-matrix:
+    name: Test Matrix (Python ${{ matrix.python-version }} on ${{ matrix.os }})
+    needs: [lint-and-format, type-check, security-scan]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install Dependencies & Test Framework
+        run: |
+          python -m pip install --upgrade pip
+          pip install cryptography pytest pytest-cov
+
+      - name: Run Test Suite (17 Tests)
+        run: pytest -v --cov=. --cov-report=term-missing

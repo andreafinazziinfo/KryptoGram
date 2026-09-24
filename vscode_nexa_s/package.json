@@ -1,0 +1,72 @@
+{
+  "name": "nexa-s-vscode",
+  "displayName": "NEXA-S // Cryptographic & Phonetic Suite",
+  "description": "Syntax highlighting, inline encryption/decryption and phonetic transliteration for NEXA-S",
+  "version": "2.0.0",
+  "publisher": "andrea-finazzi",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Security",
+    "Other"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:nexa-s",
+    "onCommand:nexa-s.encryptSelection",
+    "onCommand:nexa-s.decryptSelection",
+    "onCommand:nexa-s.transliterateSelection",
+    "onCommand:nexa-s.openTerminal"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "nexa-s",
+        "aliases": ["NEXA-S", "nexa"],
+        "extensions": [".nexa", ".nxs2"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "nexa-s",
+        "scopeName": "source.nexa-s",
+        "path": "./nexa-s.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "nexa-s.transliterateSelection",
+        "title": "NEXA-S: Traslittera Selezione (Italiano ⇄ Glifi)"
+      },
+      {
+        "command": "nexa-s.encryptSelection",
+        "title": "NEXA-S: Cifra Selezione in Busta NXS2"
+      },
+      {
+        "command": "nexa-s.decryptSelection",
+        "title": "NEXA-S: Decifra Busta Selezionata"
+      },
+      {
+        "command": "nexa-s.openTerminal",
+        "title": "NEXA-S: Apri Web Terminal Interattivo"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "nexa-s.transliterateSelection",
+        "key": "ctrl+alt+n",
+        "mac": "cmd+alt+n",
+        "when": "editorHasSelection"
+      },
+      {
+        "command": "nexa-s.encryptSelection",
+        "key": "ctrl+alt+e",
+        "mac": "cmd+alt+e",
+        "when": "editorHasSelection"
+      }
+    ]
+  }
+}

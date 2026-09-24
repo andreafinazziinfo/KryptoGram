@@ -1,0 +1,268 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" width="100%" height="100%">
+  <defs>
+    <!-- Gradienti Cyberpunk -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06080e"/>
+      <stop offset="50%" stop-color="#0a0f1d"/>
+      <stop offset="100%" stop-color="#040609"/>
+    </linearGradient>
+
+    <linearGradient id="cyan-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f3ff"/>
+      <stop offset="100%" stop-color="#00b4d8"/>
+    </linearGradient>
+
+    <linearGradient id="emerald-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00ff9d"/>
+      <stop offset="100%" stop-color="#00b875"/>
+    </linearGradient>
+
+    <linearGradient id="purple-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+
+    <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="glow-emerald" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <!-- Griglia di background -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.025)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="url(#bg-grad)"/>
+  <rect width="100%" height="100%" fill="url(#grid)"/>
+
+  <!-- Cornice Perimetrale con Angoli Tattici -->
+  <rect x="30" y="30" width="1540" height="1040" fill="none" stroke="rgba(0,243,255,0.2)" stroke-width="1.5" rx="16"/>
+  <path d="M 30 70 L 30 30 L 70 30" fill="none" stroke="#00f3ff" stroke-width="4"/>
+  <path d="M 1570 70 L 1570 30 L 1530 30" fill="none" stroke="#00f3ff" stroke-width="4"/>
+  <path d="M 30 1030 L 30 1070 L 70 1070" fill="none" stroke="#00ff9d" stroke-width="4"/>
+  <path d="M 1570 1030 L 1570 1070 L 1530 1070" fill="none" stroke="#00ff9d" stroke-width="4"/>
+
+  <!-- Header Poster -->
+  <g transform="translate(70, 95)">
+    <!-- Badge Brand -->
+    <rect x="0" y="0" width="60" height="60" rx="12" fill="rgba(0,243,255,0.1)" stroke="#00f3ff" stroke-width="1.5" filter="url(#glow-cyan)"/>
+    <text x="30" y="42" font-family="'JetBrains Mono', monospace" font-size="28" font-weight="800" fill="#00f3ff" text-anchor="middle">⟦∧⟧</text>
+    
+    <text x="80" y="34" font-family="'Outfit', sans-serif" font-size="34" font-weight="900" fill="#ffffff" letter-spacing="2">NEXA-S // TAVOLA FONETICA UFFICIALE</text>
+    <text x="80" y="55" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="500" fill="#94a3b8" letter-spacing="1">STANDARD FONETICO SIMBOLICO v2.0 &bull; CRITTOGRAFIA NXS2 (POST-QUANTUM READY)</text>
+
+    <!-- Status badge a destra -->
+    <rect x="1240" y="10" width="180" height="32" rx="16" fill="rgba(0,255,157,0.12)" stroke="#00ff9d" stroke-width="1"/>
+    <circle cx="1258" cy="26" r="4" fill="#00ff9d"/>
+    <text x="1272" y="31" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#00ff9d" letter-spacing="1">CANONICAL v2.0</text>
+  </g>
+
+  <!-- SEZIONE 1: VOCALI (VOWELS) -->
+  <g transform="translate(70, 195)">
+    <rect x="0" y="0" width="1460" height="175" rx="12" fill="rgba(14,19,29,0.6)" stroke="rgba(0,243,255,0.2)" stroke-width="1"/>
+    <text x="25" y="35" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#00f3ff" letter-spacing="1">01 // VOCALI CARDINALI (`VOWELS`)</text>
+    
+    <!-- Glifi Vocali -->
+    <!-- ∧ (A Iniziale) -->
+    <g transform="translate(50, 55)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="44" font-weight="700" fill="#00ff9d" text-anchor="middle" filter="url(#glow-emerald)">∧</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">A (Iniziale / Cap)</text>
+    </g>
+    <!-- ⊕ (A Standard) -->
+    <g transform="translate(280, 55)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="44" font-weight="700" fill="#00ff9d" text-anchor="middle" filter="url(#glow-emerald)">⊕</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">a (Aperta / Standard)</text>
+    </g>
+    <!-- ≋ (E) -->
+    <g transform="translate(510, 55)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="44" font-weight="700" fill="#00ff9d" text-anchor="middle" filter="url(#glow-emerald)">≋</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">e / è / é (Semichiusa)</text>
+    </g>
+    <!-- ∿ (I) -->
+    <g transform="translate(740, 55)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="44" font-weight="700" fill="#00ff9d" text-anchor="middle" filter="url(#glow-emerald)">∿</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">i / y (Anteriore Chiusa)</text>
+    </g>
+    <!-- ⊙ (O) -->
+    <g transform="translate(970, 55)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="44" font-weight="700" fill="#00ff9d" text-anchor="middle" filter="url(#glow-emerald)">⊙</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">o / ò (Posteriore Semichiusa)</text>
+    </g>
+    <!-- ∪ (U) -->
+    <g transform="translate(1200, 55)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="44" font-weight="700" fill="#00ff9d" text-anchor="middle" filter="url(#glow-emerald)">∪</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">u / w (Posteriore Chiusa)</text>
+    </g>
+  </g>
+
+  <!-- SEZIONE 2: CONSONANTI (CONSONANTS) -->
+  <g transform="translate(70, 395)">
+    <rect x="0" y="0" width="1460" height="295" rx="12" fill="rgba(14,19,29,0.6)" stroke="rgba(0,255,157,0.2)" stroke-width="1"/>
+    <text x="25" y="35" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#00ff9d" letter-spacing="1">02 // CONSONANTI &amp; FRICATIVE (`CONSONANTS`)</text>
+    
+    <!-- Griglia Consonanti Riga 1 -->
+    <!-- B: ⊓ -->
+    <g transform="translate(50, 55)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="38" font-weight="700" fill="#00f3ff" text-anchor="middle">⊓</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">b [Occlusiva bilabiale]</text>
+    </g>
+    <!-- C/K: ⌁ -->
+    <g transform="translate(280, 55)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="38" font-weight="700" fill="#00f3ff" text-anchor="middle">⌁</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">c / k [Occl. velare]</text>
+    </g>
+    <!-- D: ∆ -->
+    <g transform="translate(510, 55)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="38" font-weight="700" fill="#00f3ff" text-anchor="middle">∆</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">d [Alveolare sonora]</text>
+    </g>
+    <!-- F: ƒ -->
+    <g transform="translate(740, 55)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="38" font-weight="700" fill="#00f3ff" text-anchor="middle">ƒ</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">f [Labiodentale]</text>
+    </g>
+    <!-- G: ⅁ -->
+    <g transform="translate(970, 55)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="38" font-weight="700" fill="#00f3ff" text-anchor="middle">⅁</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">g [Velare sonora]</text>
+    </g>
+    <!-- L: ⌯ -->
+    <g transform="translate(1200, 55)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="38" font-weight="700" fill="#00f3ff" text-anchor="middle">⌯</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">l [Laterale alveolare]</text>
+    </g>
+
+    <!-- Griglia Consonanti Riga 2 -->
+    <!-- M: ⋔ -->
+    <g transform="translate(50, 170)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="38" font-weight="700" fill="#00f3ff" text-anchor="middle">⋔</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">m [Nasale bilabiale]</text>
+    </g>
+    <!-- N: ⋒ -->
+    <g transform="translate(280, 170)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="38" font-weight="700" fill="#00f3ff" text-anchor="middle">⋒</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">n [Nasale alveolare]</text>
+    </g>
+    <!-- P: ⌐ -->
+    <g transform="translate(510, 170)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="38" font-weight="700" fill="#00f3ff" text-anchor="middle">⌐</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">p [Occlusiva bilabiale]</text>
+    </g>
+    <!-- R/V: ⌿ -->
+    <g transform="translate(740, 170)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="38" font-weight="700" fill="#00f3ff" text-anchor="middle">⌿</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">r / v [Vibrante / Fricativa]</text>
+    </g>
+    <!-- S: ≈ -->
+    <g transform="translate(970, 170)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="38" font-weight="700" fill="#00f3ff" text-anchor="middle">≈</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">s [Fricativa alveolare]</text>
+    </g>
+    <!-- T: ⊥ -->
+    <g transform="translate(1200, 170)">
+      <rect width="180" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+      <text x="90" y="55" font-family="'JetBrains Mono', monospace" font-size="38" font-weight="700" fill="#00f3ff" text-anchor="middle">⊥</text>
+      <text x="90" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">t / h [Occl. alveolare]</text>
+    </g>
+  </g>
+
+  <!-- SEZIONE 3: SINTASSI, DELIMITATORI & CRITTOGRAFIA NXS2 -->
+  <g transform="translate(70, 715)">
+    <!-- Delimitatori & Numeri -->
+    <g transform="translate(0, 0)">
+      <rect width="900" height="295" rx="12" fill="rgba(14,19,29,0.6)" stroke="rgba(168,85,247,0.25)" stroke-width="1"/>
+      <text x="25" y="35" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#a855f7" letter-spacing="1">03 // SINTASSI &amp; LOGICA STRUTTURALE (`SYNTAX`)</text>
+      
+      <!-- Riga 1: Blocchi e Numeri -->
+      <g transform="translate(40, 55)">
+        <rect width="245" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+        <text x="122" y="55" font-family="'JetBrains Mono', monospace" font-size="34" font-weight="700" fill="#a855f7" text-anchor="middle">⟦ ... ⟧</text>
+        <text x="122" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">Delimitatore Busta / Frase</text>
+      </g>
+      <g transform="translate(325, 55)">
+        <rect width="245" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+        <text x="122" y="55" font-family="'JetBrains Mono', monospace" font-size="34" font-weight="700" fill="#a855f7" text-anchor="middle">⟪ ... ⟫</text>
+        <text x="122" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">Notazione Numerica Pura</text>
+      </g>
+      <g transform="translate(610, 55)">
+        <rect width="245" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+        <text x="122" y="55" font-family="'JetBrains Mono', monospace" font-size="34" font-weight="700" fill="#a855f7" text-anchor="middle">∴</text>
+        <text x="122" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">Punto Fermo / Full Stop</text>
+      </g>
+
+      <!-- Riga 2: Operatori CycleLab -->
+      <g transform="translate(40, 170)">
+        <rect width="245" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+        <text x="122" y="55" font-family="'JetBrains Mono', monospace" font-size="34" font-weight="700" fill="#ffb800" text-anchor="middle">⇒</text>
+        <text x="122" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">Implicazione / allora</text>
+      </g>
+      <g transform="translate(325, 170)">
+        <rect width="245" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+        <text x="122" y="55" font-family="'JetBrains Mono', monospace" font-size="34" font-weight="700" fill="#ffb800" text-anchor="middle">≥  /  ≤</text>
+        <text x="122" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">Soglie Operative / Pivot</text>
+      </g>
+      <g transform="translate(610, 170)">
+        <rect width="245" height="95" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)"/>
+        <text x="122" y="55" font-family="'JetBrains Mono', monospace" font-size="34" font-weight="700" fill="#ffb800" text-anchor="middle">%</text>
+        <text x="122" y="78" font-family="'Outfit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">Dimensionamento Rischio</text>
+      </g>
+    </g>
+
+    <!-- Specifiche NXS2 Security Stack -->
+    <g transform="translate(930, 0)">
+      <rect width="530" height="295" rx="12" fill="rgba(14,19,29,0.85)" stroke="rgba(0,255,157,0.3)" stroke-width="1.5"/>
+      <text x="25" y="35" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#00ff9d" letter-spacing="1">04 // MAXIMUM SECURITY STACK (NXS2)</text>
+      
+      <g transform="translate(25, 55)">
+        <text y="20" font-family="'JetBrains Mono', monospace" font-size="12" fill="#00f3ff">&bull; AEAD CIPHER:</text>
+        <text x="140" y="20" font-family="'JetBrains Mono', monospace" font-size="12" fill="#ffffff">XChaCha20-Poly1305 (256-bit)</text>
+
+        <text y="50" font-family="'JetBrains Mono', monospace" font-size="12" fill="#00f3ff">&bull; KDF DUAL PROFILE:</text>
+        <text x="140" y="50" font-family="'JetBrains Mono', monospace" font-size="12" fill="#ffffff">Argon2id (256MB Vault / 64MB Mobile)</text>
+
+        <text y="80" font-family="'JetBrains Mono', monospace" font-size="12" fill="#00f3ff">&bull; POST-QUANTUM KEM:</text>
+        <text x="140" y="80" font-family="'JetBrains Mono', monospace" font-size="12" fill="#ffffff">ML-KEM-768 (Kyber, NIST FIPS 203)</text>
+
+        <text y="110" font-family="'JetBrains Mono', monospace" font-size="12" fill="#00f3ff">&bull; SIGNATURE ENGINE:</text>
+        <text x="140" y="110" font-family="'JetBrains Mono', monospace" font-size="12" fill="#ffffff">Ed25519 (Non-repudiable signals)</text>
+
+        <text y="140" font-family="'JetBrains Mono', monospace" font-size="12" fill="#00f3ff">&bull; HASHING ENGINE:</text>
+        <text x="140" y="140" font-family="'JetBrains Mono', monospace" font-size="12" fill="#ffffff">BLAKE3 (Tree-hashing 256-bit)</text>
+
+        <text y="170" font-family="'JetBrains Mono', monospace" font-size="12" fill="#00f3ff">&bull; TRAFFIC DEFENSE:</text>
+        <text x="140" y="170" font-family="'JetBrains Mono', monospace" font-size="12" fill="#ffffff">Blind Constant-Pad (4096B - 8192B)</text>
+
+        <text y="200" font-family="'JetBrains Mono', monospace" font-size="12" fill="#00f3ff">&bull; CYCLELAB SYNERGY:</text>
+        <text x="140" y="200" font-family="'JetBrains Mono', monospace" font-size="12" fill="#00ff9d">Matassa Frozen IP + Mobile HUD</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Footer Informazioni Tecniche -->
+  <text x="70" y="1055" font-family="'JetBrains Mono', monospace" font-size="11" fill="#64748b">NEXA-S CRYPTOGRAPHIC ENGINE &bull; PROGETTATO E AUDITATO SECONDO IL FRAMEWORK OPERATIVO ANDREA (&gt;= 9.5 TARGET)</text>
+  <text x="1530" y="1055" font-family="'JetBrains Mono', monospace" font-size="11" fill="#64748b" text-anchor="end">CONFIDENZIALE &bull; PROPRIETÀ CYCLELAB &amp; GITNEXUS</text>
+</svg>

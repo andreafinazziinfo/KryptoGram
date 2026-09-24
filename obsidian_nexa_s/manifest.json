@@ -1,0 +1,9 @@
+{
+  "id": "nexa-s-vault",
+  "name": "NEXA-S // Encrypted Notes & Glyphs",
+  "version": "2.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Proteggi le tue note in Obsidian con l'alfabeto fonetico simbolico NEXA-S e la cifratura autenticata AEAD a zero-knowledge.",
+  "author": "Andrea Finazzi",
+  "isDesktopOnly": false
+}

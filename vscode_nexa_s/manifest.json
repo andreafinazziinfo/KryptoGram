@@ -1,0 +1,29 @@
+{
+  "name": "NEXA-S Support",
+  "publisher": "nexa-s",
+  "version": "0.1.0",
+  "description": "Syntax highlighting and basic commands for NEXA-S",
+  "engines": {"vscode": "^1.80.0"},
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [{
+      "id": "nexa-s",
+      "aliases": ["NEXA-S"],
+      "extensions": [".nexa"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "nexa-s",
+      "scopeName": "source.nexa-s",
+      "path": "./nexa-s.tmLanguage.json"
+    }],
+    "commands": [{
+      "command": "nexa-s.encryptSelection",
+      "title": "NEXA-S: Encrypt selection"
+    }, {
+      "command": "nexa-s.decryptFile",
+      "title": "NEXA-S: Decrypt file"
+    }]
+  },
+  "activationEvents": ["onLanguage:nexa-s"]
+}
