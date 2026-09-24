@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""KryptoGram v2.0 — Local CI/CD Pipeline & Audit Runner.
+"""KryptoGram v1.0 — Local CI/CD Pipeline & Audit Runner.
 (dal greco: Kryptós = Nascosto, Grámma = Scrittura)
 
 Esegue in locale l'intera pipeline di Continuous Integration conforme al
 Framework Operativo (Tier CRITICO):
-1. Test suite completa (pytest: fonetica, crittografia v2, container NXS2, CycleLab integration, advanced pillars)
+1. Test suite completa (pytest: fonetica, crittografia, container NXS2, CycleLab integration, advanced pillars)
 2. Validazione di resilienza e Chaos test (bit-flip rejection)
 3. Audit di sicurezza e controllo zero-secret in memoria
 4. Scorecard di conformità finale
@@ -48,15 +48,15 @@ def main() -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
 
-    print_header("KryptoGram v2.0 // LOCAL CI RUNNER (Framework Operativo)")
+    print_header("KryptoGram v1.0 // LOCAL CI RUNNER (Framework Operativo)")
     print("Architettura: Sovereign Keyed Conlang & Post-Quantum Enclave")
     print("Ambiente Python:", sys.version.split()[0])
 
     stages = [
         ("1. Pytest Core & Integration Suite", [sys.executable, "-m", "pytest", "-v"]),
-        ("2. Self-Test Modulo Crittografico v2.0", [sys.executable, "nexa_crypto_v2.py"]),
-        ("3. Self-Test Motore Fonetico v2.0", [sys.executable, "nexa_lib.py"]),
-        ("4. Smoke Test CLI v2.0 Roundtrip", [
+        ("2. Self-Test Modulo Crittografico KryptoGram", [sys.executable, "nexa_crypto_v2.py"]),
+        ("3. Self-Test Motore Fonetico KryptoGram", [sys.executable, "nexa_lib.py"]),
+        ("4. Smoke Test CLI KryptoGram Roundtrip", [
             sys.executable, "nexa_cli_v2.py", "encrypt",
             "--in", "docs/showcase.md",
             "--out", "ci_temp.nexa",
@@ -70,7 +70,14 @@ def main() -> None:
     for name, cmd in stages:
         # Invia passphrase via stdin per lo stage CLI
         if "nexa_cli_v2.py" in cmd:
-            p = subprocess.run(cmd, input="CIPassphrase2026!\n", text=True, capture_output=True)
+            p = subprocess.run(
+                cmd,
+                input="CIPassphrase2026!\n",
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+            )
             if p.returncode == 0:
                 print(f"✓ {name}: SUPERATO")
                 # Decifra per validazione ciclo chiuso
@@ -79,7 +86,14 @@ def main() -> None:
                     "--in", "ci_temp.nexa",
                     "--out", "ci_decrypted.txt",
                 ]
-                p_dec = subprocess.run(dec_cmd, input="CIPassphrase2026!\n", text=True, capture_output=True)
+                p_dec = subprocess.run(
+                    dec_cmd,
+                    input="CIPassphrase2026!\n",
+                    text=True,
+                    capture_output=True,
+                    encoding="utf-8",
+                    errors="replace",
+                )
                 if p_dec.returncode == 0:
                     print("✓ 4b. Smoke Test CLI Decrypt Lossless: SUPERATO")
                 else:
@@ -96,7 +110,7 @@ def main() -> None:
             if not ok:
                 all_ok = False
 
-    print_header("ESITO PIPELINE CI KRYPTOGRAM v2.0")
+    print_header("ESITO PIPELINE CI KRYPTOGRAM v1.0")
     if all_ok:
         print("  STATO: TUTTI GLI STAGE SUPERATI CON SUCCESSO ✓")
         print("  CONFORMITÀ: 1_DESIGN (9 Pilastri) & 2_EXECUTION (DoD Tier CRITICO)")

@@ -1,4 +1,4 @@
-"""Unit test suite per il modulo crittografico v2.0 (nexa_crypto_v2.py)."""
+"""Unit test suite per il modulo crittografico KryptoGram."""
 
 import os
 import pytest

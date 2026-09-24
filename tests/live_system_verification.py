@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test di Verifica Reale End-to-End per KryptoGram v2.0
+Test di Verifica Reale End-to-End per KryptoGram v1.0
 Esegue tutte le operazioni crittografiche, steganografiche e di integrazione CycleLab
 su file reali su disco con misurazione dei tempi e validazione dell'integrità.
 """
@@ -41,7 +41,7 @@ def print_section(title):
     print(f"\n{'='*70}\n[TEST REALE] {title}\n{'='*70}")
 
 def test_1_cli_and_container_roundtrip(tmpdir: Path):
-    print_section("1. CLI v2.0 & Formato Contenitore NXS2 (Roundtrip Reale su Disco)")
+    print_section("1. CLI & Formato Contenitore NXS2 (Roundtrip Reale su Disco)")
     
     sample_text = (
         "Andrea conferma l'appuntamento per domani alle 18:30 con 10 contratti BTCUSDT. "
@@ -232,7 +232,7 @@ def test_3_performance_benchmark():
 
 def main():
     print("="*70)
-    print("KryptoGram v2.0 - SUITE DI VERIFICA REALE SISTEMA & INTEGRAZIONI")
+    print("KryptoGram v1.0 - SUITE DI VERIFICA REALE SISTEMA & INTEGRAZIONI")
     print("Conforme a Framework Operativo Tier CRITICO & Standard NIST FIPS 203")
     print("="*70)
     

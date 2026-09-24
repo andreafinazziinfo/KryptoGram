@@ -25,7 +25,7 @@
         </div>
         <div>
           <div class="brand-title">
-            <h1>KryptoGram <span class="version-tag">v2.0</span> <span class="badge badge-cyan" style="font-size:0.65rem; padding: 2px 6px; margin-left: 4px; vertical-align: middle;">POST-QUANTUM READY</span></h1>
+            <h1>KryptoGram <span class="version-tag">v1.0</span> <span class="badge badge-cyan" style="font-size:0.65rem; padding: 2px 6px; margin-left: 4px; vertical-align: middle;">POST-QUANTUM READY</span></h1>
             <span class="status-indicator online"><span class="status-dot"></span> ENCLAVE OPERATIVO</span>
           </div>
           <p class="brand-subtitle">Kryptós (Nascosto) + Grámma (Scrittura) &bull; 26! Keyed Conlang &bull; NXS2 Post-Quantum Envelope &bull; CycleLab Bridge</p>
@@ -149,17 +149,17 @@
             </div>
           </div>
           <div class="panel-body">
-            <textarea id="outputGlyphs" class="cyber-textarea glyphs-font" placeholder="I glifi simbolici NEXA-S compariranno qui in tempo reale..." readonly></textarea>
+            <textarea id="outputGlyphs" class="cyber-textarea glyphs-font" placeholder="I glifi simbolici KryptoGram compariranno qui in tempo reale..." readonly></textarea>
           </div>
           <div class="panel-footer">
             <div class="glyph-metrics">
-              <span class="metric-item">Fonetica: <strong class="text-cyan">v2.0</strong></span>
+              <span class="metric-item">Fonetica: <strong class="text-cyan">v1.0</strong></span>
               <span class="metric-item">Sintassi: <strong class="text-emerald" id="syntaxStatus">VALIDA</strong></span>
               <span class="metric-item">Entropia: <strong class="text-amber" id="entropyMetric">0.00 bit</strong></span>
             </div>
             <div class="footer-actions">
               <button class="btn btn-secondary" id="sendToVaultBtn">Invia al Vault 🔐</button>
-              <button class="btn btn-primary" id="downloadGlyphsBtn">Scarica .nexa</button>
+              <button class="btn btn-primary" id="downloadGlyphsBtn">Scarica .krypto</button>
             </div>
           </div>
         </div>
@@ -281,7 +281,7 @@
           <div class="panel-header">
             <div class="panel-title-wrap">
               <span class="badge badge-cyan">AEAD &amp; PQC ENGINE</span>
-              <h2>Busta Crittografica NEXA-S (v2.0)</h2>
+              <h2>Busta Crittografica KryptoGram</h2>
             </div>
             <span class="crypto-chip">NXS2 (Post-Quantum Ready) &bull; Argon2id / PBKDF2 &bull; AEAD</span>
           </div>
@@ -292,8 +292,8 @@
               <div class="form-group col-6">
                 <label for="vaultFormatSelect">Formato Busta Crittografica</label>
                 <select id="vaultFormatSelect" class="cyber-select">
-                  <option value="nxs2" selected>NXS2 v2.0 (Post-Quantum &amp; Asymmetric Hybrid)</option>
-                  <option value="nexa1">NEXA1 v1.x (Symmetric Legacy AES-GCM)</option>
+                  <option value="nxs2" selected>NXS2 (Post-Quantum &amp; Asymmetric Hybrid)</option>
+                  <option value="nexa1">NEXA1 (Symmetric Legacy AES-GCM)</option>
                 </select>
               </div>
               <div class="form-group col-6">
@@ -317,7 +317,7 @@
               <span class="strength-hint" id="passStrengthHint">Forza: Richiesta passphrase</span>
             </div>
 
-            <!-- Opzioni v2.0: Lossless e Firma -->
+            <!-- Opzioni Envelope: Lossless e Firma -->
             <div class="form-row" style="margin-bottom: 12px;">
               <div class="form-group col-6" style="display:flex; align-items:center; gap:8px;">
                 <input type="checkbox" id="vaultLosslessCheck" checked style="accent-color: var(--accent-cyan); width:18px; height:18px;">
@@ -333,7 +333,7 @@
               <div class="form-group col-6">
                 <label for="vaultPaddingSelect">Padding Offuscamento (Traffic Analysis Defense)</label>
                 <select id="vaultPaddingSelect" class="cyber-select">
-                  <option value="4096" selected>4096 Byte (Standard NEXA-S)</option>
+                  <option value="4096" selected>4096 Byte (Standard KryptoGram)</option>
                   <option value="8192">8192 Byte (High Security Matassa)</option>
                   <option value="1024">1024 Byte (Compact)</option>
                   <option value="0">0 Byte (Nessun padding)</option>
@@ -351,11 +351,11 @@
             <div class="vault-action-buttons">
               <button class="btn btn-primary btn-large glow-btn-cyan" id="encryptActionBtn">
                 <span class="btn-icon">🔒</span>
-                <span>Cifra e Genera Busta (.nxs2 / .nexa)</span>
+                <span>Cifra e Genera Busta (.nxs2 / .krypto)</span>
               </button>
               <button class="btn btn-secondary btn-large" id="decryptActionBtn">
                 <span class="btn-icon">🔓</span>
-                <span>Decifra Busta (.nxs2 / .nexa)</span>
+                <span>Decifra Busta (.nxs2 / .krypto)</span>
               </button>
             </div>
           </div>
@@ -381,7 +381,7 @@
           <div class="panel-header">
             <div class="panel-title-wrap">
               <span class="badge badge-emerald">ENVELOPE DATA</span>
-              <h2>Payload della Busta (.nexa)</h2>
+              <h2>Payload della Busta (.nxs2)</h2>
             </div>
             <div class="panel-controls">
               <span class="char-count" id="envelopeByteCount">0 byte</span>
@@ -416,9 +416,9 @@
         <div class="panel-header">
           <div class="panel-title-wrap">
             <span class="badge badge-cyan">BYTE-LEVEL ARCHITECTURE</span>
-            <h2>Dissezione Strutturale della Busta NEXA-S</h2>
+            <h2>Dissezione Strutturale della Busta KryptoGram (NXS2)</h2>
           </div>
-          <span class="text-muted">Tracciabilità immutabile del flusso binario (Data Lineage & Provenance)</span>
+          <span class="text-muted">Tracciabilità immutabile del flusso binario (Data Lineage &amp; Provenance)</span>
         </div>
 
         <!-- Mappa dei Colori dell'Header -->
@@ -636,14 +636,14 @@
             <span class="badge badge-emerald">QUANTITATIVE PLATFORM SYNERGY</span>
             <h2>Integrazione Strategica con CycleLab Terminal</h2>
           </div>
-          <span class="text-muted">Come NEXA-S potenzia la sicurezza della piattaforma di trading quantitativo</span>
+          <span class="text-muted">Come KryptoGram potenzia la sicurezza della piattaforma di trading quantitativo</span>
         </div>
 
         <div class="cyclelab-pillars-grid">
           <div class="cl-box">
             <div class="cl-icon">🛡️</div>
             <h3>1. Confine IP ("Matassa Frozen")</h3>
-            <p>CycleLab protegge il core proprietario <code>progetto-matassa</code> (analisi ciclica e pivot non-repainting). Con NEXA-S, i pesi di Fourier e le costanti di calcolo possono essere cifrati in buste protette da Argon2id prima della sincronizzazione mobile.</p>
+            <p>CycleLab protegge il core proprietario <code>progetto-matassa</code> (analisi ciclica e pivot non-repainting). Con KryptoGram, i pesi di Fourier e le costanti di calcolo possono essere cifrati in buste protette da Argon2id prima della sincronizzazione mobile.</p>
             <span class="cl-tag text-emerald">IP Protection</span>
           </div>
 
@@ -657,7 +657,7 @@
           <div class="cl-box">
             <div class="cl-icon">👁️</div>
             <h3>3. Offuscamento Visivo Anti-Shoulder Surfing</h3>
-            <p>Sull'app mobile Android di CycleLab (Capacitor), attivare la modalità "NEXA-S HUD" trasforma i segnali ciclici e gli alert in glifi simbolici: incomprensibili per chi osserva lo schermo in pubblico, ma leggibili per il trader.</p>
+            <p>Sull'app mobile Android di CycleLab (Capacitor), attivare la modalità "KryptoGram HUD" trasforma i segnali ciclici e gli alert in glifi simbolici: incomprensibili per chi osserva lo schermo in pubblico, ma leggibili per il trader.</p>
             <span class="cl-tag text-purple">Mobile Tactical HUD</span>
           </div>
 

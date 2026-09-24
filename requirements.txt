@@ -2,6 +2,7 @@
 # Core dependencies
 PyNaCl>=1.5.0,<2.0.0          # XChaCha20, X25519, Ed25519
 argon2-cffi>=23.1.0,<26.0.0    # Argon2id KDF
+cryptography>=41.0.0           # AES-GCM / PBKDF2 compatibility
 
 # Post-Quantum Cryptography (optional, for --pq mode)
 pqcrypto-kyber>=0.1.0          # ML-KEM-768 (Kyber) - NIST FIPS 203
@@ -14,4 +15,3 @@ pytest>=7.4.0                  # Testing framework
 hypothesis>=6.88.0             # Property-based testing
 mypy>=1.5.0                    # Type checking
 ruff>=0.0.290                  # Fast linter
-black>=23.7.0                  # Code formatter

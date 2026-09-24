@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kryptogram"
-version = "2.0.0"
+version = "1.0.0"
 description = "KryptoGram: Sovereign Post-Quantum Cryptographic Envelope & Keyed Phonetic Conlang"
 readme = "README.md"
 license = {text = "MIT"}
@@ -35,11 +35,11 @@ dev = [
 ]
 
 [project.scripts]
-kryptogram = "nexa_cli_v2:main"
-nexa-s = "nexa_cli_v2:main"
+kryptogram = "kryptogram:main"
+nexa-s = "kryptogram:main"
 nexa-gui = "gui_nexa:main"
 
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["nexa*"]
+include = ["nexa*", "kryptogram*"]

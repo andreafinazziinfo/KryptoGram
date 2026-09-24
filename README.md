@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⟦∧⟧ KryptoGram v2.0
+# ⟦∧⟧ KryptoGram
 ### Sovereign Post-Quantum Envelope & Keyed Phonetic Cryptography Engine
 *(dal greco: **Kryptós** [κρυπτός = nascosto] + **Grámma** [γράμμα = scrittura])*
 
@@ -14,7 +14,7 @@
 
 *Il primo sistema unificato di **scrittura fonetica simbolica a permutazione dinamica (26!)** e **busta crittografica autenticata asimmetrica/post-quantum (NXS2)** progettato per sovranità dei dati personali, cold storage fisico e protezione IP algoritmica.*
 
-[Web Terminal](./index.html) · [CLI v2.0](./nexa_cli_v2.py) · [CycleLab Bridge](./cyclelab_bridge.py) · [Plugin VS Code](./vscode_nexa_s/) · [Plugin Obsidian](./obsidian_nexa_s/) · [CI Runner](./run_ci.py)
+[Web Terminal](./index.html) · [CLI](./nexa_cli_v2.py) · [CycleLab Bridge](./cyclelab_bridge.py) · [Plugin VS Code](./vscode_nexa_s/) · [Plugin Obsidian](./obsidian_nexa_s/) · [CI Runner](./run_ci.py)
 
 </div>
 
@@ -152,11 +152,18 @@ classDiagram
 
 ---
 
-## 🔤 Tavola Fonetica dei Glifi
+## 🔤 Tavola dei Glifi Simbolici (Dialetto Canonico Dimostrativo)
+
+> [!IMPORTANT]
+> **SICUREZZA & PRINCIPIO DI KERCKHOFFS:**
+> La tavola sottostante illustra esclusivamente la **mappatura canonica di default (pubblica)**, utile per test, comprensione e interoperabilità aperta.
+> **Per la riservatezza reale e sovrana si attiva la Permutazione Dinamica con Chiave** (`--alphabet-key <chiave>`):  
+> In modalità dinamica, questa tavola **NON viene utilizzata**. Il motore rimescola deterministicamente i 26 glifi geometrici tramite HMAC-SHA256 e Fisher-Yates, selezionando uno tra **$26! \approx 4.03 \times 10^{26}$ dialetti segreti (~88 bit di entropia steganografica)**.  
+> Chiunque legga questa tabella pubblica non potrà decifrare alcun testo protetto senza conoscere la tua chiave segreta dell'alfabeto.
 
 La tavola vettoriale completa ad altissima risoluzione è disponibile in [assets/glyph_table.svg](./assets/glyph_table.svg).
 
-| Famiglia | Fonema / Grafema | Glifo NEXA-S | Descrizione Fonetica |
+| Famiglia | Fonema / Grafema | Glifo KryptoGram (Dialetto Demo) | Descrizione Fonetica |
 |---|---|:---:|---|
 | **Vocali** | `A` (iniziale) | `∧` | Anteriore aperta maiuscola |
 | | `a` (standard) | `⊕` | Anteriore aperta standard |
@@ -303,8 +310,9 @@ Alfabeto Cryptato/
 ├── index.html                   # Web Terminal interattivo standalone
 ├── style.css                    # Design system cyberpunk-dark (glassmorphism)
 ├── app.js                       # Motore client-side (Web Crypto AEAD + Web Audio API)
+├── kryptogram.py                # Entrypoint principale e CLI unificata
 ├── nexa_lib.py                  # Libreria core fonetica bidirezionale con permutazione dinamica (26!)
-├── nexa_crypto_v2.py            # Modulo crittografico v2.0 (Post-Quantum, Argon2id, Pepper, Secret Key)
+├── nexa_crypto_v2.py            # Modulo crittografico di base (Post-Quantum, Argon2id, Pepper, Secret Key)
 ├── nexa_cli_v2.py               # CLI unificata di produzione
 ├── cyclelab_bridge.py           # Connettore nativo per CycleLab Terminal (SDK 6 Pilastri Difesa)
 ├── run_ci.py                    # Runner CI locale one-click conforme al Framework Operativo
@@ -321,16 +329,16 @@ Alfabeto Cryptato/
 ### 1. Web Terminal Interattivo
 Fai doppio click su [index.html](./index.html) per aprire direttamente l'app nel tuo browser (Chrome, Edge, Brave, Firefox) senza installare nulla.
 
-### 2. Cifratura e Decifratura da Riga di Comando (CLI v2.0)
+### 2. Cifratura e Decifratura da Riga di Comando (CLI)
 ```bash
 # Cifratura NXS2 con profilo Desktop, padding 4096B e traslitterazione fonetica:
-python nexa_cli_v2.py encrypt --in documento.txt --out documento.nexa --profile desktop --nexa --pad 4096
+python kryptogram.py encrypt --in documento.txt --out documento.nexa --profile desktop --nexa --pad 4096
 
 # Cifratura ottimizzata per CycleLab Mobile Terminal:
-python nexa_cli_v2.py encrypt --in segnali.json --out segnali.nexa --profile mobile
+python kryptogram.py encrypt --in segnali.json --out segnali.nexa --profile mobile
 
 # Decifratura (ripristino automatico al 100% dell'ortografia originale con Lossless Metadata):
-python nexa_cli_v2.py decrypt --in documento.nexa --out documento_decifrato.txt
+python kryptogram.py decrypt --in documento.nexa --out documento_decifrato.txt
 ```
 
 ### 3. Utilizzo del Connettore CycleLab
@@ -360,12 +368,12 @@ python run_ci.py
 **Esito dei test attuali**:
 ```text
 ======================================================================
-  ESITO PIPELINE CI KRYPTOGRAM v2.0
+  ESITO PIPELINE CI KRYPTOGRAM v1.0
 ======================================================================
 ✓ 1. Pytest Core, Dynamic Alphabet & Advanced Pillars Suite (52/52 test superati)
-✓ 2. Self-Test Modulo Crittografico v2.0 (Dual profile, NXS2, Ed25519, Pepper)
-✓ 3. Self-Test Motore Fonetico v2.0 (Permutazione 26!, digrammi, validatore)
-✓ 4. Smoke Test CLI v2.0 Roundtrip & Lossless Restoration
+✓ 2. Self-Test Modulo Crittografico KryptoGram (Dual profile, NXS2, Ed25519, Pepper)
+✓ 3. Self-Test Motore Fonetico KryptoGram (Permutazione 26!, digrammi, validatore)
+✓ 4. Smoke Test CLI KryptoGram Roundtrip & Lossless Restoration
 STATO: TUTTI GLI STAGE SUPERATI CON SUCCESSO ✓
 CONFORMITÀ: 1_DESIGN (9 Pilastri) & 2_EXECUTION (DoD Tier CRITICO)
 ```
@@ -383,7 +391,7 @@ Il progetto è sviluppato e governato secondo i criteri dell'**Operational Engin
 
 <div align="center">
 
-**KryptoGram v2.0 &bull; Sovereign Open Source Enclave**  
+**KryptoGram v1.0 &bull; Sovereign Open Source Enclave**  
 *Autore: Andrea Finazzi &bull; Sinergia Ecosistema CycleLab & GitNexus*
 
 </div>

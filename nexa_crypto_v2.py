@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NEXA-S Crypto Module v2.0 — Maximum Security Free Stack.
+"""KryptoGram Crypto Module — Maximum Security Free Stack.
 
 Architettura crittografica di produzione conforme al Framework Operativo Andrea:
 - Cifratura simmetrica: XChaCha20-Poly1305 / ChaCha20-Poly1305 (256-bit AEAD)
@@ -174,7 +174,7 @@ def hash_blake3(data: bytes) -> bytes:
     if BLAKE3_AVAILABLE:
         hasher = blake3.blake3()
         hasher.update(data)
-        return hasher.digest()
+        return bytes(hasher.digest())
     import hashlib
     return hashlib.blake2b(data, digest_size=32).digest()
 
@@ -243,11 +243,11 @@ def verify_signature(verify_key_bytes: bytes, signed_data: bytes) -> bytes:
     sig = signed_data[-64:]
 
     if NACL_AVAILABLE:
-        vk = nacl.signing.VerifyKey(verify_key_bytes)
-        return vk.verify(signed_data)
+        vk_nacl = nacl.signing.VerifyKey(verify_key_bytes)
+        return bytes(vk_nacl.verify(signed_data))
     elif CRYPTOGRAPHY_AVAILABLE:
-        vk = ed25519.Ed25519PublicKey.from_public_bytes(verify_key_bytes)
-        vk.verify(sig, data)
+        vk_crypto = ed25519.Ed25519PublicKey.from_public_bytes(verify_key_bytes)
+        vk_crypto.verify(sig, data)
         return data
     else:
         raise RuntimeError("Backend Ed25519 non disponibile")
@@ -468,17 +468,20 @@ def unpack_nxs2_envelope(
 
 def secure_zero(buffer: bytearray) -> None:
     """Sovrascrive in modo sicuro dati sensibili in memoria volatile."""
-    if NACL_AVAILABLE:
-        nacl.utils.sodium_memzero(buffer)
-    else:
-        for i in range(len(buffer)):
-            buffer[i] = 0
+    try:
+        if NACL_AVAILABLE and hasattr(nacl.bindings, "sodium_memzero"):
+            nacl.bindings.sodium_memzero(buffer)  # type: ignore[attr-defined]
+            return
+    except Exception:
+        pass
+    for i in range(len(buffer)):
+        buffer[i] = 0
 
 
 if __name__ == "__main__":
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    print("NEXA-S Crypto Module v2.0 — Maximum Security Free Stack")
+    print("KryptoGram Crypto Module — Maximum Security Free Stack")
     print(f"Backend PyNaCl: {NACL_AVAILABLE} | Cryptography: {CRYPTOGRAPHY_AVAILABLE}")
     print(f"Argon2id Nativo: {ARGON2_AVAILABLE} | Kyber768 (PQ): {PQ_AVAILABLE} | BLAKE3: {BLAKE3_AVAILABLE}")
 
@@ -498,4 +501,4 @@ if __name__ == "__main__":
     dec_data, meta = unpack_nxs2_envelope(envelope, "MasterKey2026!")
     assert dec_data == sample_bytes
     print(f"Decifratura NXS2 Superata! Metadata estratto: {meta}")
-    print("Test Suite v2.0: OK ✓")
+    print("Test Suite KryptoGram: OK ✓")

@@ -1,4 +1,4 @@
-"""Property-Based Testing & Chaos Fuzzing Suite per NEXA-S v2.0.
+"""Property-Based Testing & Chaos Fuzzing Suite per KryptoGram.
 
 Implementa test invarianti su proprietà matematiche e fuzzing su input estremi
 conforme ai requisiti di certificazione del Framework Operativo (Pilastro 6 1_DESIGN).

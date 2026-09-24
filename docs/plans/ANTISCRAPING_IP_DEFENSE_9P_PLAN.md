@@ -103,7 +103,25 @@ Questo piano definisce la strategia di **difesa attiva e protezione della propri
 
 ---
 
-### 6. PEOPLE / ACCESS GOVERNANCE (Gestione Account & Sessioni)
+### 6. PEOPLE / ACCESS GOVERNANCE (Gestione Account, Sessioni & Hardened Login)
+
+#### A. Autenticazione a Due Componenti (Dual-Part Credential) & Salt + Pepper
+Per neutralizzare attacchi di credential stuffing, phishing, keylogger e furto del database:
+1. **Credenziale a Doppia Componente**:
+   - Componente 1: La passphrase scelta dall'utente ($P_{\text{user}}$).
+   - Componente 2: Il codice hardware/enclave ($C_{\text{enclave}}$) a 128 bit generato dal nostro algoritmo (formato: `NXS-XXXX-XXXX-...`).
+   - Le due componenti vengono fuse deterministicamente prima dell'hashing:  
+     $$\text{Credential} = \text{HMAC-SHA256}(P_{\text{user}}, C_{\text{enclave}})$$
+   - Anche se un ladro ruba o intercetta la password dell'utente, l'account **non può essere sbloccato** senza il codice enclave conservato offline.
+
+2. **Blindatura con Salt Casuale & Pepper Hardware/Server**:
+   - **Salt (Pubblico)**: 16 byte CSPRNG univoci per ogni utente, salvati nel database per distruggere qualsiasi attacco basato su rainbow table precalcolate.
+   - **Pepper (Segreto d'Infrastruttura)**: 32 byte conservati **esclusivamente nelle variabili d'ambiente protette del server o in enclave HSM**, mai scritti nel database.
+   - **Derivazione KDF**:
+     $$\text{MasterKey} = \text{Argon2id}(\text{Credential}, \text{Salt}, \text{mem}=256\text{MB}, \text{iter}=3, \text{pepper}=\text{Pepper})$$
+   - **Difesa da Data Breach**: Se un attaccante esfiltra l'intero database utenti, tutti gli hash rimangono matematicamente indecifrabili perché il Pepper non è presente nel database.
+
+#### B. Controlli Sessione & Device Binding
 * **Device Fingerprinting Univoco**: Associazione dell'account al canvas hash e alla scheda grafica dell'utente: impedisce l'uso simultaneo delle stesse credenziali su più macchine o script di scraping paralleli.
 * **Revocabilità Istantanea**: Capacità del backend di invalidare istantaneamente il token JWT in caso di comportamento anomalo rilevato.
 

@@ -1,4 +1,4 @@
-name: NEXA-S v2.0 CI/CD Pipeline
+name: KryptoGram CI/CD Pipeline
 
 on:
   push:
@@ -11,8 +11,8 @@ permissions:
   contents: read
 
 jobs:
-  lint-and-format:
-    name: Code Quality (Ruff & Formatting)
+  lint:
+    name: Code Quality (Ruff Linter)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -27,13 +27,10 @@ jobs:
       - name: Install Linting Tools
         run: |
           python -m pip install --upgrade pip
-          pip install ruff black
+          pip install ruff
 
       - name: Run Ruff Linter
         run: ruff check .
-
-      - name: Check Code Formatting (Black)
-        run: black --check .
 
   type-check:
     name: Static Type Analysis (Mypy)
@@ -52,10 +49,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e .
-          pip install mypy pytest
+          pip install mypy pytest types-setuptools
 
       - name: Run Mypy Type Checker
-        run: mypy --config-file mypy.ini nexa_lib.py nexa_crypto_v2.py nexa_cli_v2.py
+        run: mypy --config-file mypy.ini nexa_lib.py nexa_crypto_v2.py nexa_cli_v2.py cyclelab_bridge.py kryptogram.py
 
   security-scan:
     name: Cryptographic & Secret Audit
@@ -75,11 +72,11 @@ jobs:
           pip install bandit
 
       - name: Run Bandit Security Audit
-        run: bandit -r nexa_lib.py nexa_crypto_v2.py nexa_cli_v2.py -ll
+        run: bandit -r nexa_lib.py nexa_crypto_v2.py nexa_cli_v2.py cyclelab_bridge.py kryptogram.py -ll
 
   test-matrix:
     name: Test Matrix (Python ${{ matrix.python-version }} on ${{ matrix.os }})
-    needs: [lint-and-format, type-check, security-scan]
+    needs: [lint, type-check, security-scan]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -100,7 +97,7 @@ jobs:
       - name: Install Dependencies & Test Framework
         run: |
           python -m pip install --upgrade pip
-          pip install cryptography pytest pytest-cov
+          pip install cryptography PyNaCl argon2-cffi pytest pytest-cov
 
-      - name: Run Test Suite (17 Tests)
-        run: pytest -v --cov=. --cov-report=term-missing
+      - name: Run Full Test Suite (52 Tests)
+        run: pytest -v

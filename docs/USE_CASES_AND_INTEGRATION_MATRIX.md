@@ -2,7 +2,7 @@
 
 ## 📌 Visione d'Insieme
 
-Questo documento mappa e formalizza tutti i casi d'uso concreti di **KryptoGram v2.0** (dal greco *Kryptós* = nascosto + *Grámma* = scrittura), suddivisi tra:
+Questo documento mappa e formalizza tutti i casi d'uso concreti di **KryptoGram v1.0** (dal greco *Kryptós* = nascosto + *Grámma* = scrittura), suddivisi tra:
 1. **Integrazione Verticale con CycleLab Terminal** (Difesa IP Matassa, API Gateway, Chatbot, Trading Signal Bus, Anti-Scraping 9P).
 2. **Applicazioni Esterne Universali** (Cold storage fisico su piastre metalliche, Obsidian vault cifrato, VS Code, comunicazioni covert, tutela brevetti e progetti dell'ecosistema).
 3. **Analisi di Sicurezza & Threat Model**: Principio di Kerckhoffs e permutazione dinamica con chiave ($26! \approx 4.03 \times 10^{26}$ dialetti per rilascio pubblico su GitHub).
@@ -65,7 +65,7 @@ Il piano di difesa 9P precedentemente formulato per CycleLab definiva 3 fasi:
 - *Fase 2: Core Isolation & Protobuf* (Formule solo su server, streaming vettoriale binario).
 - *Fase 3: Desktop App Shielding* (Bytenode V8 `.jsc`, anti-debugging).
 
-**In che modo KRYPTONEX / NEXA-S v2.0 si integra e potenzia il piano 9P**:
+**In che modo KryptoGram si integra e potenzia il piano 9P**:
 1. **Sostituzione/Evoluzione di HMAC (Fase 1)**: Invece del solo HMAC-SHA256 simmetrico, l'API Gateway adotta firme digitali asimmetriche **Ed25519** e contenitori **NXS2**, eliminando il rischio di furto del segreto condiviso.
 2. **Serializzazione Binaria (Fase 2)**: Il formato NXS2 con header a 46 byte e padding fisso (4096B/8192B) funge da involucro cifrato nativo per i payload binari (Protobuf / FlatBuffers).
 3. **Watermarking Steganografico (Pilastro 8)**: La logica fonetica di `nexa_lib.py` si sposa con la steganografia dei grafici, iniettando marcatori crittografici non ripudiabili nei dati distribuiti per identificare legalmente le fughe di notizie.

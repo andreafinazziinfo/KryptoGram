@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""KryptoGram v2.0 Unified Command Line Interface.
+"""KryptoGram v1.0 Unified Command Line Interface.
 (dal greco: Kryptós = Nascosto, Grámma = Scrittura)
 
 Fornisce comandi completi di produzione per:
@@ -49,7 +49,7 @@ def main() -> None:
         sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(
         prog="kryptogram",
-        description="KryptoGram v2.0 — Post-Quantum Symbolic Cryptography Engine (Kryptós + Grámma)",
+        description="KryptoGram v1.0 — Post-Quantum Symbolic Cryptography Engine (Kryptós + Grámma)",
     )
     subparsers = parser.add_subparsers(dest="cmd", required=True)
 
