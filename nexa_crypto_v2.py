@@ -12,6 +12,8 @@ Architettura crittografica di produzione conforme al Framework Operativo Andrea:
 
 from __future__ import annotations
 import base64
+import hashlib
+import hmac
 import json
 import os
 import struct
@@ -115,9 +117,6 @@ def derive_key_argon2id(
     Se pepper è specificato (chiave segreta d'infrastruttura/HSM), viene applicato tramite
     HMAC-SHA256 prima della KDF per proteggere da leak di database (Defense-in-Depth).
     """
-    import hashlib
-    import hmac
-
     params = KDF_PARAMS.get(profile, KDF_PARAMS[KDFProfile.DESKTOP_VAULT])
     secret_bytes = passphrase.encode("utf-8")
     if pepper is not None:
@@ -175,7 +174,6 @@ def hash_blake3(data: bytes) -> bytes:
         hasher = blake3.blake3()
         hasher.update(data)
         return bytes(hasher.digest())
-    import hashlib
     return hashlib.blake2b(data, digest_size=32).digest()
 
 
@@ -405,7 +403,18 @@ def unpack_nxs2_envelope(
         salt = envelope[5:21]
         nonce = envelope[21:33]
         ciphertext = envelope[33:]
-        key = derive_key_argon2id(passphrase, salt, profile=KDFProfile.DESKTOP_VAULT)
+        if ARGON2_AVAILABLE:
+            key = hash_secret_raw(
+                secret=passphrase.encode("utf-8"),
+                salt=salt,
+                time_cost=3,
+                memory_cost=65536,
+                parallelism=4,
+                hash_len=KEY_LEN,
+                type=Type.ID,
+            )
+        else:
+            key = hashlib.pbkdf2_hmac("sha256", passphrase.encode("utf-8"), salt, 600000, dklen=KEY_LEN)
         # Decifratura AEAD legacy
         if CRYPTOGRAPHY_AVAILABLE:
             aead = ChaCha20Poly1305(key)
